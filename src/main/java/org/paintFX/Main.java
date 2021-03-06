@@ -11,8 +11,8 @@ import java.io.IOException;
 
 public class Main extends Application {
 
-    private static Scene scene;
-    private static final String title = "Version - 0.02";
+    private Scene scene;
+    private final String title = "Version - 0.02";
 
     public static void main(String[] args) {
         launch();
@@ -22,9 +22,7 @@ public class Main extends Application {
     public void start(Stage stage) throws IOException {
 
         stage.setTitle(title);
-
-        Parent root = loadFXML("Main");
-        scene = new Scene(root);
+        scene = new Scene(loadFXML("Main"));
 
         String pathToIcon = "icon.png";
         try {
@@ -52,5 +50,4 @@ public class Main extends Application {
 
         return image;
     }
-
 }
