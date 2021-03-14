@@ -8,7 +8,7 @@ import java.io.IOException;
 
 public class Main extends Application {
 
-    private final String title = "Version - 0.05";
+    private final String title = "Version - 0.06";
 
     public static void main(String[] args) {
         launch();
@@ -17,7 +17,7 @@ public class Main extends Application {
     @Override
     public void start(Stage stage) throws IOException {
 
-        Scene scene = new Scene(Loader.loadFXML("Main"));
+        Scene scene = new Scene(Loader.loadFXML("MainScene"));
 
         stage.setTitle(title);
         stage.getIcons().add(Loader.loadImage("icon.png"));
