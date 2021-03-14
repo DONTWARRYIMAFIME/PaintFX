@@ -1,10 +1,10 @@
 package org.paintFX.ShapeFactory;
 
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Paint;
+import org.paintFX.PaintMode;
 import org.paintFX.Shapes.Shape;
 
 @FunctionalInterface
 public interface ShapeFactory {
-    Shape createShape(Paint borderColor, Paint fillColor, double lineWidth);
+    Shape createShape(double[] points, double borderSize, Paint fillColor, Paint borderColor, PaintMode paintMode);
 }

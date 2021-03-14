@@ -3,19 +3,20 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.canvas.Canvas?>
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ColorPicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.paintFX.PaintController">
+<BorderPane xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.paintFX.Controller">
    <top>
       <VBox>
          <MenuBar>
@@ -28,10 +29,26 @@
          <ToolBar>
             <HBox alignment="CENTER" spacing="5">
                <children>
-                  <TextField fx:id="brushSize" text="18" />
-                  <ColorPicker fx:id="colorPicker" />
-                  <CheckBox fx:id="eraser" text="Eraser" />
-                  <Button fx:id="toolPen" defaultButton="true" mnemonicParsing="false" text="Pen" />
+                  <TextField fx:id="brushSize" onInputMethodTextChanged="#setBorderSize" onKeyReleased="#setBorderSize" text="18" />
+                  <ColorPicker fx:id="cpFill" onAction="#setFillColor" />
+                  <ColorPicker fx:id="cpBorder" onAction="#setBorderColor" />
+                  <Button mnemonicParsing="false" onAction="#onSwap" text="Swap" />
+               </children>
+            </HBox>
+            <HBox alignment="TOP_RIGHT" prefHeight="0.0" prefWidth="942.0" spacing="5">
+               <children>
+                  <ToggleButton fx:id="rbFilled" mnemonicParsing="false" onAction="#setPaintModeToFilled" selected="true" text="Filled">
+                     <toggleGroup>
+                        <ToggleGroup fx:id="PaintMode" />
+                     </toggleGroup>
+                  </ToggleButton>
+                  <ToggleButton fx:id="rbBordered" mnemonicParsing="false" onAction="#setPaintModeToBordered" text="Bordered" toggleGroup="$PaintMode" />
+                  <ToggleButton fx:id="rbFilledWithBorder" mnemonicParsing="false" onAction="#setPaintModeToFilledWithBorder" text="Filled with border" toggleGroup="$PaintMode" />
+                  <Button cancelButton="true" mnemonicParsing="false" onAction="#clearCanvas" text="Clear canvas">
+                     <HBox.margin>
+                        <Insets left="10.0" right="10.0" />
+                     </HBox.margin>
+                  </Button>
                </children>
             </HBox>
          </ToolBar>
@@ -39,29 +56,42 @@
    </top>
 
    <center>
-      <Canvas fx:id="canvas" height="720.0" onMouseMoved="#setMouseCoordinates" onMouseReleased="#onMouseClickCanvas" width="1280.0" BorderPane.alignment="CENTER" />
+      <Canvas fx:id="canvas" height="720.0" width="1280.0" BorderPane.alignment="CENTER" />
    </center>
    <bottom>
       <ToolBar blendMode="MULTIPLY" BorderPane.alignment="CENTER">
          <HBox alignment="CENTER" spacing="5">
             <children>
+               <Label fx:id="lblTool" text="Tool : -" />
                <Label fx:id="mouseCoordinates" text="X : 0.0px    Y : 0.0px " />
             </children>
          </HBox>
       </ToolBar>
    </bottom>
    <right>
-      <VBox prefHeight="720.0" prefWidth="133.0" style="-fx-border-color: black;" BorderPane.alignment="CENTER">
+      <VBox prefHeight="720.0" prefWidth="133.0" style="-fx-background-color: #ebebeb;" BorderPane.alignment="CENTER">
          <children>
             <HBox alignment="CENTER" spacing="5">
                <children>
-                  <Button fx:id="toolRectangle" mnemonicParsing="false" onAction="#setShapeFactoryToRectangle" text="Rectangle" />
+                  <Button fx:id="btnPen" mnemonicParsing="false" onAction="#setPenTool" text="Pen" />
+                  <Button fx:id="btnEraser" mnemonicParsing="false" onAction="#setEraserTool" text="Eraser" />
+               </children>
+               <VBox.margin>
+                  <Insets bottom="5.0" top="5.0" />
+               </VBox.margin>
+            </HBox>
+            <HBox alignment="CENTER" spacing="5">
+               <children>
+                  <Button fx:id="btnRectangle" maxHeight="32.0" maxWidth="32.0" mnemonicParsing="false" onAction="#setShapeFactoryToRectangle" />
                   <Button fx:id="toolEllipse" mnemonicParsing="false" onAction="#setShapeFactoryToCircle" text="Ellipse" />
                </children>
+               <VBox.margin>
+                  <Insets bottom="5.0" top="5.0" />
+               </VBox.margin>
             </HBox>
          </children>
          <BorderPane.margin>
-            <Insets right="5.0" />
+            <Insets />
          </BorderPane.margin>
       </VBox>
    </right>
