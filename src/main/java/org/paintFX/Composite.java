@@ -7,8 +7,8 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 
 public class Composite implements Shape {
-    private Deque<Shape> components = new ArrayDeque<>();
-    private Deque<Shape> memory = new ArrayDeque<>();
+    private final Deque<Shape> components = new ArrayDeque<>();
+    private final Deque<Shape> memory = new ArrayDeque<>();
 
     public void addComponent(Shape component) {
         components.offerLast(component);
@@ -50,7 +50,8 @@ public class Composite implements Shape {
     }
 
     public void drawLast(GraphicsContext g) {
-        components.peekLast().draw(g);
+            assert components.peekLast() != null;
+            components.peekLast().draw(g);
     }
 
 
