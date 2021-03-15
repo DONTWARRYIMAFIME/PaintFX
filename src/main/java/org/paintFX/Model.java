@@ -34,6 +34,10 @@ public class Model {
         this.g = canvas.getGraphicsContext2D();
     }
 
+    public PaintMode getPaintMode() {
+        return paintMode;
+    }
+
     public void addPoint(double x, double y) {
         points.add(x);
         points.add(y);

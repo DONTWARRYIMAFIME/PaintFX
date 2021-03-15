@@ -67,13 +67,24 @@
       </VBox>
    </top>
    <bottom>
-      <ToolBar blendMode="MULTIPLY" BorderPane.alignment="CENTER">
-         <HBox alignment="CENTER" spacing="5">
+      <ToolBar>
+         <VBox>
             <children>
-               <Label fx:id="lblTool" text="Tool : -" />
-               <Label fx:id="mouseCoordinates" text="X : 0.0px    Y : 0.0px " />
+               <HBox alignment="CENTER_LEFT">
+                  <children>
+                     <Label fx:id="lblPaintMode" text="Paint mode :">
+                        <graphic>
+                           <Label fx:id="lblTool" text="Tool :" />
+                        </graphic></Label>
+                  </children>
+               </HBox>
+               <HBox alignment="CENTER_LEFT" spacing="5">
+                  <children>
+                     <Label fx:id="mouseCoordinates" text="X : 0.0    Y : 0.0 " />
+                  </children>
+               </HBox>
             </children>
-         </HBox>
+         </VBox>
       </ToolBar>
    </bottom>
    <right>

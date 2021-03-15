@@ -30,6 +30,9 @@ public class MainSceneController {
 
     //Labels
     @FXML
+    private Label lblPaintMode;
+
+    @FXML
     private Label lblTool;
 
     @FXML
@@ -101,7 +104,7 @@ public class MainSceneController {
         setBorderColor();
         setBorderSize();
 
-        model.setPaintMode(PaintMode.FILLED);
+        setPaintModeToFilled();
         setPenTool();
 
         paintMode.selectedToggleProperty().addListener((obsVal, oldVal, newVal) -> {
@@ -209,12 +212,21 @@ public class MainSceneController {
 
     public void setPaintModeToFilled() {
         model.setPaintMode(PaintMode.FILLED);
+        setPaintModeLabel();
     }
 
-    public void setPaintModeToBordered() { model.setPaintMode(PaintMode.BORDERED); }
+    public void setPaintModeToBordered() {
+        model.setPaintMode(PaintMode.BORDERED);
+        setPaintModeLabel();
+    }
 
     public void setPaintModeToFilledWithBorder() {
         model.setPaintMode(PaintMode.FILLED_WITH_BORDER);
+        setPaintModeLabel();
+    }
+
+    public void setPaintModeLabel() {
+        lblPaintMode.setText("Paint mode : " + model.getPaintMode().getName());
     }
 
     public void onSave() {

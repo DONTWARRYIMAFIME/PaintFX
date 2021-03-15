@@ -8,8 +8,6 @@ import java.io.IOException;
 
 public class Main extends Application {
 
-    private final String title = "Version - 0.08";
-
     public static void main(String[] args) {
         launch();
     }
@@ -17,6 +15,7 @@ public class Main extends Application {
     @Override
     public void start(Stage stage) throws IOException {
 
+        String title = "Version - 0.08";
         Scene scene = new Scene(Loader.loadFXML("Scenes/MainScene"));
 
         stage.setTitle(title);
