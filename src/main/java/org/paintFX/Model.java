@@ -7,7 +7,10 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseButton;
 import javafx.scene.paint.Paint;
+
 import org.paintFX.ShapeFactory.ShapeFactory;
+import org.paintFX.Shapes.Circle;
+import org.paintFX.Shapes.Rectangle;
 import org.paintFX.Shapes.Shape;
 
 import javax.imageio.ImageIO;
@@ -24,7 +27,7 @@ public class Model {
     private final GraphicsContext g;
 
     private ShapeFactory shapeFactory;
-    private PaintMode paintMode = PaintMode.FILLED;
+    private PaintMode paintMode;
 
     public Model(Canvas canvas) {
         this.canvas = canvas;
@@ -42,13 +45,9 @@ public class Model {
         );
     }
 
-    public void setPaintMode(PaintMode paintMode) {
-        this.paintMode = paintMode;
-    }
+    public void setPaintMode(PaintMode paintMode) { this.paintMode = paintMode; }
 
-    public void setShapeFactory(ShapeFactory shapeFactory) {
-        this.shapeFactory = shapeFactory;
-    }
+    public void setShapeFactory(ShapeFactory shapeFactory) { this.shapeFactory = shapeFactory; }
 
     public void setFillColor(Paint color) {
         g.setFill(color);
@@ -62,102 +61,141 @@ public class Model {
         g.setLineWidth(size);
     }
 
-    public Shape createShapeByPoints() {
-        Double[] arr = new Double[points.size()];
-        points.toArray(arr);
-
-        double[] points = Stream.of(arr).mapToDouble(Double::doubleValue).toArray();
-        Shape shape = shapeFactory.createShape(points, g.getLineWidth(), g.getFill(), g.getStroke(), paintMode);
-
-        this.points.clear();
-
-        return shape;
-    }
-
     public String showMouseCoordinates(double x, double y) {
         return String.format("X : %.01f       Y : %.01f", x, y);
     }
 
-    public void draw() {
-        components.draw(g);
-    }
-
-    public void setPenTool(double size) {
-        resetMouseEvents();
+    public void setPenTool() {
+        Composite composite = new Composite();
 
         canvas.setOnMouseDragged(e -> {
+
+            double size = g.getLineWidth();
             double x = e.getX() - size / 2;
             double y = e.getY() - size / 2;
 
-            g.fillOval(x, y, size, size);
-
+            composite.addComponent(new Circle(x, y, size, size, g.getFill(), g.getFill(), PaintMode.FILLED));
+            composite.drawLast(g);
         });
+
+        canvas.setOnMouseReleased(e -> {
+            components.addComponent(composite);
+            setPenTool();
+        });
+
     }
 
-    public void setEraserTool(double size) {
-        resetMouseEvents();
+    public void setEraserTool() {
+        Composite composite = new Composite();
 
         canvas.setOnMouseDragged(e -> {
+            double size = g.getLineWidth();
             double x = e.getX() - size / 2;
             double y = e.getY() - size / 2;
 
-            g.clearRect(x, y, size, size);
+            composite.addComponent(new Rectangle(x, y, size, size, size, g.getFill(), g.getStroke(), PaintMode.CLEAR));
+            composite.drawLast(g);
+        });
+
+        canvas.setOnMouseReleased(e -> {
+            components.addComponent(composite);
+            setEraserTool();
         });
     }
 
-    public void clearCanvas() {
-        g.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
-    }
+    public void clearCanvas() { g.clearRect(0, 0, canvas.getWidth(), canvas.getHeight()); }
 
     public void removeComponents() {
         components.removeAllComponents();
+        components.clearMemory();
     }
 
 
     public void bindMouseForDrawingRegularShapes() {
-        resetMouseEvents();
-
-        canvas.setOnMousePressed(e ->
-                addPoint(e.getX(), e.getY())
-        );
+        canvas.setOnMousePressed(e -> addPoint(e.getX(), e.getY()));
 
         canvas.setOnMouseReleased(e -> {
-            clearCanvas();
-
             addPoint(e.getX(), e.getY());
-            components.pushComponent(createShapeByPoints());
-            draw();
+            components.addComponent(createShapeByPoints());
+            components.drawLast(g);
+
+            components.clearMemory();
+            clearPoints();
         });
 
-//        canvas.setOnMouseDragged(e -> {
-//            clearCanvas();
-//
-//            model.addPoint(e.getX(), e.getY());
-//            Shape shape = model.createShapeByPoints(shapeFactory);
-//            components.pushComponent(shape);
-//            draw();
-//
-//        });
+        canvas.setOnMouseDragged(e -> {
+            clearCanvas();
+            addPoint(e.getX(), e.getY());
+            components.addComponent(createShapeByPoints());
+            removeLastPoint();
+            components.draw(g);
+            components.removeComponent();
+        });
     }
 
-    private void bindMouseDrawingDifficultShape() {
-        resetMouseEvents();
-
+    public void bindMouseDrawingDifficultShape() {
         canvas.setOnMousePressed(e -> {
             if (e.getButton() == MouseButton.PRIMARY) {
                 addPoint(e.getX(), e.getY());
             } else if (e.getButton() == MouseButton.SECONDARY) {
-                components.pushComponent(createShapeByPoints());
-                draw();
+                if (points.size() > 0) {
+                    addPoint(e.getX(), e.getY());
+                    components.addComponent(createShapeByPoints());
+                    components.drawLast(g);
+
+                    components.clearMemory();
+                    clearPoints();
+                } else {
+                    System.out.println("Polygon will be invisible. Put more points");
+                }
+            }
+        });
+
+        canvas.setOnMouseMoved(e -> {
+            if (points.size() > 0) {
+                clearCanvas();
+                addPoint(e.getX(), e.getY());
+                components.addComponent(createShapeByPoints());
+                removeLastPoint();
+                components.draw(g);
+                components.removeComponent();
             }
         });
     }
 
-    private void resetMouseEvents() {
+    public void resetMouseEvents() {
         canvas.setOnMousePressed(e -> {});
         canvas.setOnMouseReleased(e -> {});
         canvas.setOnMouseDragged(e -> {});
-        //canvas.setOnMouseMoved(e -> showMouseCoordinates(e.getX(), e.getY()));
+    }
+
+    private Shape createShapeByPoints() {
+        Double[] arr = new Double[points.size()];
+        points.toArray(arr);
+
+        double[] points = Stream.of(arr).mapToDouble(Double::doubleValue).toArray();
+        return shapeFactory.createShape(points, g.getLineWidth(), g.getFill(), g.getStroke(), paintMode);
+    }
+
+    public void onUndo() {
+        components.undoComponent();
+        clearCanvas();
+        components.draw(g);
+    }
+
+    public void onRedo() {
+        components.redoComponent();
+        clearCanvas();
+        components.draw(g);
+    }
+
+    private void clearPoints() {
+        points.clear();
+    }
+
+    private void removeLastPoint() {
+        points.remove(points.size() - 1); //X
+        points.remove(points.size() - 1); //Y
     }
 
     //Menu
@@ -178,18 +216,6 @@ public class Model {
 
     public void onExit() {
         Platform.exit();
-    }
-
-    //
-    public static Image loadImage(String path) {
-        Image image = null;
-        try {
-            image = new Image(Main.class.getResource(path).toURI().toString());
-        } catch (Exception e) {
-            System.out.format("Cannot convert your path(%s) to URI\n", path);
-        }
-
-        return image;
     }
 
 }

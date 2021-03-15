@@ -5,6 +5,7 @@ import javafx.scene.Parent;
 import javafx.scene.image.Image;
 
 import java.io.IOException;
+import org.paintFX.Controllers.*;
 
 public class Loader {
 

@@ -6,10 +6,9 @@ import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
-import org.paintFX.ShapeFactory.CircleFactory;
-import org.paintFX.ShapeFactory.RectangleFactory;
+import org.paintFX.ShapeFactory.*;
 
-public class Controller {
+public class MainSceneController {
 
     private Model model;
 
@@ -36,7 +35,28 @@ public class Controller {
 
     //Tools
     @FXML
+    private Button btnUndo;
+
+    @FXML
+    private Button btnRedo;
+
+    @FXML
     private Button btnPen;
+
+    @FXML
+    private Button btnEraser;
+
+    @FXML
+    private Button btnCircle;
+
+    @FXML
+    private Button btnEllipse;
+
+    @FXML
+    private Button btnLine;
+
+    @FXML
+    private Button btnPolygon;
 
     @FXML
     private Button btnRectangle;
@@ -47,14 +67,22 @@ public class Controller {
         model = new Model(canvas);
 
         //Icons for tools
-        btnRectangle.setGraphic(new ImageView(Model.loadImage("icons/rectangle.png")));
+        btnUndo.setGraphic(new ImageView(Loader.loadImage("icons/undo.png")));
+        btnRedo.setGraphic(new ImageView(Loader.loadImage("icons/redo.png")));
+
+        btnPen.setGraphic(new ImageView(Loader.loadImage("icons/pen.png")));
+        btnEraser.setGraphic(new ImageView(Loader.loadImage("icons/eraser.png")));
+        btnCircle.setGraphic(new ImageView(Loader.loadImage("icons/circle.png")));
+        btnEllipse.setGraphic(new ImageView(Loader.loadImage("icons/ellipse.png")));
+        btnLine.setGraphic(new ImageView(Loader.loadImage("icons/line.png")));
+        btnPolygon.setGraphic(new ImageView(Loader.loadImage("icons/polygon.png")));
+        btnRectangle.setGraphic(new ImageView(Loader.loadImage("icons/rectangle.png")));
 
         setFillColor();
         setBorderColor();
         setBorderSize();
 
-        setFillColor();
-
+        model.setPaintMode(PaintMode.FILLED);
         canvas.setOnMouseMoved(e -> showMouseCoordinates(e));
     }
 
@@ -76,17 +104,22 @@ public class Controller {
 
     public void setPenTool() {
         lblTool.setText("Tool : 'Pen' ");
-        model.setPenTool(Double.parseDouble(brushSize.getText()));
+
+        model.resetMouseEvents();
+        model.setPenTool();
     }
 
     public void setEraserTool() {
         lblTool.setText("Tool : 'Eraser' ");
-        model.setEraserTool(Double.parseDouble(brushSize.getText()));
+
+        model.resetMouseEvents();
+        model.setEraserTool();
     }
 
     public void setShapeFactoryToRectangle() {
         lblTool.setText("Tool : 'Rectangle' ");
 
+        model.resetMouseEvents();
         model.bindMouseForDrawingRegularShapes();
         model.setShapeFactory(new RectangleFactory());
     }
@@ -94,8 +127,33 @@ public class Controller {
     public void setShapeFactoryToCircle() {
         lblTool.setText("Tool : 'Circle' ");
 
+        model.resetMouseEvents();
         model.bindMouseForDrawingRegularShapes();
         model.setShapeFactory(new CircleFactory());
+    }
+
+    public void setShapeFactoryToEllipse() {
+        lblTool.setText("Tool : 'Ellipse' ");
+
+        model.resetMouseEvents();
+        model.bindMouseForDrawingRegularShapes();
+        model.setShapeFactory(new EllipseFactory());
+    }
+
+    public void setShapeFactoryToLine() {
+        lblTool.setText("Tool : 'Line' ");
+
+        model.resetMouseEvents();
+        model.bindMouseForDrawingRegularShapes();
+        model.setShapeFactory(new LineFactory());
+    }
+
+    public void setShapeFactoryToPolygon() {
+        lblTool.setText("Tool : 'Polygon' ");
+
+        model.resetMouseEvents();
+        model.bindMouseDrawingDifficultShape();
+        model.setShapeFactory(new PolygonFactory());
     }
 
     public void onSwap() {
@@ -107,6 +165,14 @@ public class Controller {
         setBorderColor();
     }
 
+    public void onUndo() {
+        model.onUndo();
+    }
+
+    public void onRedo() {
+        model.onRedo();
+    }
+
     public void clearCanvas() {
         model.clearCanvas();
         model.removeComponents();
@@ -116,9 +182,7 @@ public class Controller {
         model.setPaintMode(PaintMode.FILLED);
     }
 
-    public void setPaintModeToBordered() {
-        model.setPaintMode(PaintMode.BORDERED);
-    }
+    public void setPaintModeToBordered() { model.setPaintMode(PaintMode.BORDERED); }
 
     public void setPaintModeToFilledWithBorder() {
         model.setPaintMode(PaintMode.FILLED_WITH_BORDER);

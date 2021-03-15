@@ -7,25 +7,50 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 
 public class Composite implements Shape {
-    private Deque<Shape> stack = new ArrayDeque<>();
+    private Deque<Shape> components = new ArrayDeque<>();
+    private Deque<Shape> memory = new ArrayDeque<>();
 
-    public void pushComponent(Shape component) {
-        stack.offerLast(component);
+    public void addComponent(Shape component) {
+        components.offerLast(component);
     }
 
-    public Shape popComponent() {
-        return stack.pollLast();
+    public Shape removeComponent() {
+        return components.pollLast();
+    }
+
+    public void undoComponent() {
+        try {
+            memory.offerLast(components.pollLast());
+        } catch (NullPointerException e) {
+            System.out.println("Nothing to undo");
+        }
+    }
+
+    public void redoComponent() {
+        try {
+            components.offerLast(memory.pollLast());
+        } catch (NullPointerException e) {
+            System.out.println("Nothing to redo");
+        }
+    }
+
+    public void clearMemory() {
+        memory.clear();
     }
 
     public void removeAllComponents() {
-        stack.clear();
+        components.clear();
     }
 
     @Override
     public void draw(GraphicsContext g) {
-        for (Shape component : stack) {
+        for (Shape component : components) {
             component.draw(g);
         }
+    }
+
+    public void drawLast(GraphicsContext g) {
+        components.peekLast().draw(g);
     }
 
 
