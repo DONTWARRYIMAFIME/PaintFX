@@ -8,7 +8,7 @@ import java.io.IOException;
 
 public class Main extends Application {
 
-    private final String title = "Version - 0.06";
+    private final String title = "Version - 0.08";
 
     public static void main(String[] args) {
         launch();
