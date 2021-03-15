@@ -4,7 +4,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Paint;
 import org.paintFX.PaintMode;
 
-public class Rectangle implements Shape {
+public class Ellipse implements Shape {
 
     private final double borderSize;
     private final Paint fillColor;
@@ -16,7 +16,7 @@ public class Rectangle implements Shape {
     private final double width;
     private final double height;
 
-    public Rectangle(double[] points, double borderSize, Paint fillColor, Paint borderColor, PaintMode paintMode) {
+    public Ellipse(double[] points, double borderSize, Paint fillColor, Paint borderColor, PaintMode paintMode) {
         this.fillColor = fillColor;
         this.borderColor = borderColor;
         this.paintMode = paintMode;
@@ -29,7 +29,7 @@ public class Rectangle implements Shape {
         height = Math.abs(points[1] - points[3]);
     }
 
-    public Rectangle(double leftCornerX, double leftCornerY, double width, double height, double borderSize, Paint fillColor, Paint borderColor, PaintMode paintMode) {
+    public Ellipse(double leftCornerX, double leftCornerY, double width, double height, double borderSize, Paint fillColor, Paint borderColor, PaintMode paintMode) {
         this.fillColor = fillColor;
         this.borderColor = borderColor;
         this.paintMode = paintMode;
@@ -50,18 +50,15 @@ public class Rectangle implements Shape {
         g.setFill(fillColor);
 
         switch (paintMode) {
-            case CLEAR:
-                g.clearRect(leftCornerX, leftCornerY, width, height);
-                break;
             case FILLED:
-                g.fillRect(leftCornerX, leftCornerY, width, height);
+                g.fillOval(leftCornerX, leftCornerY, width, height);
                 break;
             case BORDERED:
-                g.strokeRect(leftCornerX, leftCornerY, width, height);
+                g.strokeOval(leftCornerX, leftCornerY, width, height);
                 break;
             case FILLED_WITH_BORDER:
-                g.fillRect(leftCornerX, leftCornerY, width, height);
-                g.strokeRect(leftCornerX, leftCornerY, width, height);
+                g.fillOval(leftCornerX, leftCornerY, width, height);
+                g.strokeOval(leftCornerX, leftCornerY, width, height);
                 break;
             default:
                 System.out.println("Unknown paint mode");
