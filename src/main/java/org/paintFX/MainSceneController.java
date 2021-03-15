@@ -8,9 +8,12 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import org.paintFX.ShapeFactory.*;
 
+import java.util.regex.Pattern;
+
 public class MainSceneController {
 
     private Model model;
+    private final Pattern pattern = Pattern.compile("\\d{0,3}");
 
     @FXML
     private Canvas canvas;
@@ -41,30 +44,46 @@ public class MainSceneController {
     private Button btnRedo;
 
     @FXML
-    private Button btnPen;
+    private ToggleButton btnPen;
 
     @FXML
-    private Button btnEraser;
+    private ToggleButton btnEraser;
 
     @FXML
-    private Button btnCircle;
+    private ToggleButton btnCircle;
 
     @FXML
-    private Button btnEllipse;
+    private ToggleButton btnEllipse;
 
     @FXML
-    private Button btnLine;
+    private ToggleButton btnLine;
 
     @FXML
-    private Button btnPolygon;
+    private ToggleButton btnPolygon;
 
     @FXML
-    private Button btnRectangle;
+    private ToggleButton btnRectangle;
+
+    @FXML
+    private ToggleGroup paintMode;
+
+    @FXML
+    private ToggleGroup tools;
 
 
     public void initialize() {
         //Init model
         model = new Model(canvas);
+        canvas.setOnMouseMoved(this::showMouseCoordinates);
+
+        TextFormatter<?> formatter = new TextFormatter<>(change -> {
+            if (pattern.matcher(change.getControlNewText()).matches()) {
+                return change;
+            } else {
+                return null;
+            }
+        });
+        brushSize.setTextFormatter(formatter);
 
         //Icons for tools
         btnUndo.setGraphic(new ImageView(Loader.loadImage("icons/undo.png")));
@@ -83,7 +102,17 @@ public class MainSceneController {
         setBorderSize();
 
         model.setPaintMode(PaintMode.FILLED);
-        canvas.setOnMouseMoved(e -> showMouseCoordinates(e));
+        setPenTool();
+
+        paintMode.selectedToggleProperty().addListener((obsVal, oldVal, newVal) -> {
+            if (newVal == null)
+                oldVal.setSelected(true);
+        });
+
+        tools.selectedToggleProperty().addListener((obsVal, oldVal, newVal) -> {
+            if (newVal == null)
+                oldVal.setSelected(true);
+        });
     }
 
     public void setFillColor() {
