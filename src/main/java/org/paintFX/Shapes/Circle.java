@@ -1,21 +1,22 @@
 package org.paintFX.Shapes;
 
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.paint.Paint;
+
 import org.paintFX.PaintMode;
+import org.paintFX.SColor;
 
 public class Circle implements Shape {
 
     private final double borderSize;
-    private final Paint fillColor;
-    private final Paint borderColor;
+    private final SColor fillColor;
+    private final SColor borderColor;
     private final PaintMode paintMode;
 
     private final double centerX;
     private final double centerY;
     private final double diameter;
 
-    public Circle(double[] points, double borderSize, Paint fillColor, Paint borderColor, PaintMode paintMode) {
+    public Circle(double[] points, double borderSize, SColor fillColor, SColor borderColor, PaintMode paintMode) {
         this.fillColor = fillColor;
         this.borderColor = borderColor;
         this.paintMode = paintMode;
@@ -26,7 +27,7 @@ public class Circle implements Shape {
         centerY = points[1] - diameter / 2;
     }
 
-    public Circle(double centerX, double centerY, double diameter, double borderSize, Paint fillColor, Paint borderColor, PaintMode paintMode) {
+    public Circle(double centerX, double centerY, double diameter, double borderSize, SColor fillColor, SColor borderColor, PaintMode paintMode) {
         this.fillColor = fillColor;
         this.borderColor = borderColor;
         this.paintMode = paintMode;
@@ -41,8 +42,8 @@ public class Circle implements Shape {
     public void draw(GraphicsContext g) {
 
         g.setLineWidth(borderSize);
-        g.setStroke(borderColor);
-        g.setFill(fillColor);
+        g.setStroke(borderColor.getFXColor());
+        g.setFill(fillColor.getFXColor());
 
         switch (paintMode) {
             case FILLED:

@@ -22,6 +22,8 @@ public class Main extends Application {
         stage.getIcons().add(Loader.loadImage("icon.png"));
         stage.setScene(scene);
         stage.show();
+        stage.setMinWidth(stage.getWidth());
+        stage.setMinHeight(stage.getHeight());
     }
 
 }

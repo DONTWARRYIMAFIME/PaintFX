@@ -1,6 +1,7 @@
 package org.paintFX;
 
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.paint.Paint;
 import org.paintFX.Shapes.Shape;
 
 import java.util.ArrayDeque;
@@ -44,9 +45,19 @@ public class Composite implements Shape {
 
     @Override
     public void draw(GraphicsContext g) {
+
+        double currentBorderSize = g.getLineWidth();
+        Paint currentFillColor = g.getFill();
+        Paint currentBorderColor = g.getStroke();
+
         for (Shape component : components) {
             component.draw(g);
         }
+
+        g.setLineWidth(currentBorderSize);
+        g.setFill(currentFillColor);
+        g.setStroke(currentBorderColor);
+
     }
 
     public void drawLast(GraphicsContext g) {

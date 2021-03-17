@@ -2,8 +2,9 @@ package org.paintFX.Shapes;
 
 import javafx.scene.canvas.GraphicsContext;
 
-public interface Shape {
+import java.io.Serializable;
 
+@FunctionalInterface
+public interface Shape extends Serializable {
     void draw(GraphicsContext g);
-
 }

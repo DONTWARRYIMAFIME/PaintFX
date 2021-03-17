@@ -1,18 +1,18 @@
 package org.paintFX.Shapes;
 
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.paint.Paint;
 import org.paintFX.PaintMode;
+import org.paintFX.SColor;
 
 public class Line implements Shape {
 
     private final double borderSize;
-    private final Paint borderColor;
+    private final SColor borderColor;
     private final PaintMode paintMode;
 
     private final double[] points;
 
-    public Line(double[] points, double borderSize, Paint borderColor, PaintMode paintMode) {
+    public Line(double[] points, double borderSize, SColor borderColor, PaintMode paintMode) {
         this.borderColor = borderColor;
         this.paintMode = paintMode;
         this.borderSize = borderSize;
@@ -24,7 +24,7 @@ public class Line implements Shape {
     public void draw(GraphicsContext g) {
 
         g.setLineWidth(borderSize);
-        g.setStroke(borderColor);
+        g.setStroke(borderColor.getFXColor());
 
         switch (paintMode) {
             case FILLED:

@@ -1,19 +1,19 @@
 package org.paintFX.Shapes;
 
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.paint.Paint;
 import org.paintFX.PaintMode;
+import org.paintFX.SColor;
 
 public class Polygon implements Shape {
 
     private final double borderSize;
-    private final Paint fillColor;
-    private final Paint borderColor;
+    private final SColor fillColor;
+    private final SColor borderColor;
     private final PaintMode paintMode;
 
     private final double[] points;
 
-    public Polygon(double[] points, double borderSize, Paint fillColor, Paint borderColor, PaintMode paintMode) {
+    public Polygon(double[] points, double borderSize, SColor fillColor, SColor borderColor, PaintMode paintMode) {
         this.fillColor = fillColor;
         this.borderColor = borderColor;
         this.paintMode = paintMode;
@@ -26,8 +26,8 @@ public class Polygon implements Shape {
     public void draw(GraphicsContext g) {
 
         g.setLineWidth(borderSize);
-        g.setStroke(borderColor);
-        g.setFill(fillColor);
+        g.setStroke(borderColor.getFXColor());
+        g.setFill(fillColor.getFXColor());
 
         double[] pointsX = new double[points.length / 2];
         double[] pointsY = new double[points.length / 2];

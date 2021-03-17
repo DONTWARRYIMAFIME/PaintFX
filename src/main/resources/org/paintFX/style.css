@@ -1,0 +1,4 @@
+.canvasBackground{
+    -fx-background-image: url("transitive.png");
+    -fx-background-repeat: repeat;   
+}

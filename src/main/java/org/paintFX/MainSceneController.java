@@ -229,6 +229,22 @@ public class MainSceneController {
         lblPaintMode.setText("Paint mode : " + model.getPaintMode().getName());
     }
 
+    public void onCreateCanvas() {
+        try {
+            CreateCanvas createCanvas = new CreateCanvas(canvas);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void onSerialize() {
+        model.onSerialize();
+    }
+
+    public void onDeserialize() {
+        model.onDeserialize();
+    }
+
     public void onSave() {
         model.onSave(canvas);
     }

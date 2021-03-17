@@ -6,6 +6,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseButton;
+import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 
 import org.paintFX.ShapeFactory.ShapeFactory;
@@ -14,7 +15,7 @@ import org.paintFX.Shapes.Rectangle;
 import org.paintFX.Shapes.Shape;
 
 import javax.imageio.ImageIO;
-import java.io.File;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
@@ -22,7 +23,8 @@ import java.util.stream.Stream;
 public class Model {
 
     private final List<Double> points = new ArrayList<>();
-    private final Composite components = new Composite();
+    private Composite components = new Composite();
+
     private final Canvas canvas;
     private final GraphicsContext g;
 
@@ -78,12 +80,13 @@ public class Model {
             double x = e.getX() - size / 2;
             double y = e.getY() - size / 2;
 
-            composite.addComponent(new Circle(x, y, size, size, g.getFill(), g.getFill(), PaintMode.FILLED));
+            composite.addComponent(new Circle(x, y, size, size, new SColor((Color)g.getFill()), new SColor((Color)g.getFill()), PaintMode.FILLED));
             composite.drawLast(g);
         });
 
         canvas.setOnMouseReleased(e -> {
             components.addComponent(composite);
+            components.clearMemory();
             setPenTool();
         });
 
@@ -97,12 +100,13 @@ public class Model {
             double x = e.getX() - size / 2;
             double y = e.getY() - size / 2;
 
-            composite.addComponent(new Rectangle(x, y, size, size, size, g.getFill(), g.getStroke(), PaintMode.CLEAR));
+            composite.addComponent(new Rectangle(x, y, size, size, size, new SColor((Color)g.getFill()), new SColor((Color)g.getStroke()), PaintMode.CLEAR));
             composite.drawLast(g);
         });
 
         canvas.setOnMouseReleased(e -> {
             components.addComponent(composite);
+            components.clearMemory();
             setEraserTool();
         });
     }
@@ -178,7 +182,7 @@ public class Model {
         points.toArray(arr);
 
         double[] points = Stream.of(arr).mapToDouble(Double::doubleValue).toArray();
-        return shapeFactory.createShape(points, g.getLineWidth(), g.getFill(), g.getStroke(), paintMode);
+        return shapeFactory.createShape(points, g.getLineWidth(), new SColor((Color)g.getFill()), new SColor((Color)g.getStroke()), paintMode);
     }
 
     public void onUndo() {
@@ -203,6 +207,34 @@ public class Model {
     }
 
     //Menu
+    public void onSerialize() {
+        try {
+            FileOutputStream fileOutputStream = new FileOutputStream("out/components.bin");
+            ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
+
+            objectOutputStream.writeObject(components);
+
+            fileOutputStream.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void onDeserialize() {
+        try {
+            FileInputStream fileInputStream = new FileInputStream("out/components.bin");
+            ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
+
+            components = (Composite) objectInputStream.readObject();
+            components.draw(g);
+
+            fileInputStream.close();
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void onSave(Canvas canvas) {
         try {
             String path = "out";

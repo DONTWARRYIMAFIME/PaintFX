@@ -12,16 +12,20 @@
 <?import javafx.scene.control.ToggleButton?>
 <?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.paintFX.MainSceneController">
+<BorderPane minHeight="600.0" minWidth="800.0" style="-fx-background-color: #ebebeb;" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.paintFX.MainSceneController">
    <top>
       <VBox>
          <MenuBar>
             <Menu text="File">
-               <MenuItem onAction="#onSave" text="Save" />
+               <MenuItem onAction="#onCreateCanvas" text="Create canvas" />
+               <MenuItem onAction="#onDeserialize" text="Open" />
+               <MenuItem onAction="#onSerialize" text="Save As Bin" />
+               <MenuItem onAction="#onSave" text="Save PNG" />
                <MenuItem onAction="#onExit" text="Exit" />
             </Menu>
          </MenuBar>
@@ -47,7 +51,7 @@
                   <Insets />
                </opaqueInsets>
             </HBox>
-            <HBox alignment="TOP_RIGHT" prefHeight="0.0" prefWidth="942.0" spacing="5">
+            <HBox alignment="TOP_RIGHT" spacing="5">
                <children>
                   <ToggleButton fx:id="rbFilled" mnemonicParsing="false" onAction="#setPaintModeToFilled" selected="true" text="Filled">
                      <toggleGroup>
@@ -88,7 +92,7 @@
       </ToolBar>
    </bottom>
    <right>
-      <VBox prefHeight="720.0" prefWidth="133.0" style="-fx-background-color: #ebebeb;" BorderPane.alignment="CENTER">
+      <VBox maxWidth="120.0" minHeight="490.0" minWidth="120.0" style="-fx-background-color: #ebebeb;" BorderPane.alignment="CENTER">
          <children>
             <HBox alignment="CENTER" spacing="5">
                <children>
@@ -97,7 +101,7 @@
                         <ToggleGroup fx:id="tools" />
                      </toggleGroup>
                   </ToggleButton>
-                  <ToggleButton fx:id="btnEraser" mnemonicParsing="false" onAction="#setEraserTool" toggleGroup="$tools" />
+                  <ToggleButton fx:id="btnEraser" mnemonicParsing="false" onAction="#setEraserTool" style="-fx-background-image: url(&quot;icons/eraser.png&quot;);" toggleGroup="$tools" />
                </children>
                <VBox.margin>
                   <Insets bottom="5.0" top="5.0" />
@@ -135,7 +139,11 @@
          </BorderPane.margin>
       </VBox>
    </right>
-   <left>
-      <Canvas fx:id="canvas" height="720.0" width="1280.0" BorderPane.alignment="CENTER" />
-   </left>
+   <center>
+      <AnchorPane maxHeight="400.0" maxWidth="650.0" prefHeight="400.0" prefWidth="650.0" styleClass="canvasBackground" stylesheets="@../style.css" BorderPane.alignment="CENTER">
+         <children>
+            <Canvas fx:id="canvas" height="494.0" styleClass="canvasBackground" width="650.0" />
+         </children>
+      </AnchorPane>
+   </center>
 </BorderPane>
