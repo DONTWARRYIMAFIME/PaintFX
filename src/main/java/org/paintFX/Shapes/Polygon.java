@@ -1,8 +1,8 @@
 package org.paintFX.Shapes;
 
 import javafx.scene.canvas.GraphicsContext;
-import org.paintFX.PaintMode;
-import org.paintFX.SColor;
+import org.paintFX.MainWindow.PaintMode;
+import org.paintFX.MainWindow.SColor;
 
 public class Polygon implements Shape {
 

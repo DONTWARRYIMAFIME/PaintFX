@@ -1,18 +1,21 @@
-package org.paintFX;
+package org.paintFX.CreateCanvasWindow;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
+import org.paintFX.Loader;
 
-public class CreateCanvas {
+public class CreateCanvasWindow {
 
-    public CreateCanvas(Canvas canvas) throws Exception {
+    public CreateCanvasWindow(Pane canvasPane, Canvas canvas) throws Exception {
         Stage stage = new Stage();
 
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("Scenes/CreateCanvasScene.fxml"));
+        FXMLLoader loader = Loader.loadFXML("Scenes/CreateCanvasScene");
         Scene scene = new Scene(loader.load());
         CreateCanvasSceneController controller = loader.getController();
+        controller.setCanvasPane(canvasPane);
         controller.setCanvas(canvas);
 
         stage.setTitle("Create canvas");

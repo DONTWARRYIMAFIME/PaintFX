@@ -1,8 +1,8 @@
 package org.paintFX.Shapes;
 
 import javafx.scene.canvas.GraphicsContext;
-import org.paintFX.PaintMode;
-import org.paintFX.SColor;
+import org.paintFX.MainWindow.PaintMode;
+import org.paintFX.MainWindow.SColor;
 
 public class Rectangle implements Shape {
 
@@ -27,19 +27,6 @@ public class Rectangle implements Shape {
 
         width = Math.abs(points[0] - points[2]);
         height = Math.abs(points[1] - points[3]);
-    }
-
-    public Rectangle(double leftCornerX, double leftCornerY, double width, double height, double borderSize, SColor fillColor, SColor borderColor, PaintMode paintMode) {
-        this.fillColor = fillColor;
-        this.borderColor = borderColor;
-        this.paintMode = paintMode;
-        this.borderSize = borderSize;
-
-        this.leftCornerX = leftCornerX;
-        this.leftCornerY = leftCornerY;
-
-        this.width = width;
-        this.height = height;
     }
 
     @Override

@@ -1,4 +1,4 @@
-package org.paintFX;
+package org.paintFX.MainWindow;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Paint;

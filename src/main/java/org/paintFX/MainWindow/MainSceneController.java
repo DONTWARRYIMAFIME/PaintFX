@@ -1,11 +1,13 @@
-package org.paintFX;
+package org.paintFX.MainWindow;
 
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
+import org.paintFX.Loader;
 import org.paintFX.ShapeFactory.*;
 
 import java.util.regex.Pattern;
@@ -14,6 +16,9 @@ public class MainSceneController {
 
     private Model model;
     private final Pattern pattern = Pattern.compile("\\d{0,3}");
+
+    @FXML
+    private AnchorPane canvasPane;
 
     @FXML
     private Canvas canvas;
@@ -76,8 +81,7 @@ public class MainSceneController {
 
     public void initialize() {
         //Init model
-        model = new Model(canvas);
-        canvas.setOnMouseMoved(this::showMouseCoordinates);
+        model = new Model(canvasPane, canvas);
 
         TextFormatter<?> formatter = new TextFormatter<>(change -> {
             if (pattern.matcher(change.getControlNewText()).matches()) {
@@ -130,6 +134,11 @@ public class MainSceneController {
         model.setBorderSize(Double.parseDouble(brushSize.getText()));
     }
 
+    private void resetMouseEvents() {
+        model.resetMouseEvents();
+        canvas.setOnMouseMoved(this::showMouseCoordinates);
+    }
+
     public void showMouseCoordinates(MouseEvent e) {
         mouseCoordinates.setText(model.showMouseCoordinates(e.getX(), e.getY()));
     }
@@ -137,21 +146,21 @@ public class MainSceneController {
     public void setPenTool() {
         lblTool.setText("Tool : 'Pen' ");
 
-        model.resetMouseEvents();
+        resetMouseEvents();
         model.setPenTool();
     }
 
     public void setEraserTool() {
         lblTool.setText("Tool : 'Eraser' ");
 
-        model.resetMouseEvents();
+        resetMouseEvents();
         model.setEraserTool();
     }
 
     public void setShapeFactoryToRectangle() {
         lblTool.setText("Tool : 'Rectangle' ");
 
-        model.resetMouseEvents();
+        resetMouseEvents();
         model.bindMouseForDrawingRegularShapes();
         model.setShapeFactory(new RectangleFactory());
     }
@@ -159,7 +168,7 @@ public class MainSceneController {
     public void setShapeFactoryToCircle() {
         lblTool.setText("Tool : 'Circle' ");
 
-        model.resetMouseEvents();
+        resetMouseEvents();
         model.bindMouseForDrawingRegularShapes();
         model.setShapeFactory(new CircleFactory());
     }
@@ -167,7 +176,7 @@ public class MainSceneController {
     public void setShapeFactoryToEllipse() {
         lblTool.setText("Tool : 'Ellipse' ");
 
-        model.resetMouseEvents();
+        resetMouseEvents();
         model.bindMouseForDrawingRegularShapes();
         model.setShapeFactory(new EllipseFactory());
     }
@@ -175,7 +184,7 @@ public class MainSceneController {
     public void setShapeFactoryToLine() {
         lblTool.setText("Tool : 'Line' ");
 
-        model.resetMouseEvents();
+        resetMouseEvents();
         model.bindMouseForDrawingRegularShapes();
         model.setShapeFactory(new LineFactory());
     }
@@ -183,7 +192,7 @@ public class MainSceneController {
     public void setShapeFactoryToPolygon() {
         lblTool.setText("Tool : 'Polygon' ");
 
-        model.resetMouseEvents();
+        resetMouseEvents();
         model.bindMouseDrawingDifficultShape();
         model.setShapeFactory(new PolygonFactory());
     }
@@ -230,15 +239,7 @@ public class MainSceneController {
     }
 
     public void onCreateCanvas() {
-        try {
-            CreateCanvas createCanvas = new CreateCanvas(canvas);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void onSerialize() {
-        model.onSerialize();
+        model.onCreateCanvas();
     }
 
     public void onDeserialize() {

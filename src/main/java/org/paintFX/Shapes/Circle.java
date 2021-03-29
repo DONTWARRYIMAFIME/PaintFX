@@ -1,9 +1,8 @@
 package org.paintFX.Shapes;
 
 import javafx.scene.canvas.GraphicsContext;
-
-import org.paintFX.PaintMode;
-import org.paintFX.SColor;
+import org.paintFX.MainWindow.PaintMode;
+import org.paintFX.MainWindow.SColor;
 
 public class Circle implements Shape {
 
@@ -25,17 +24,6 @@ public class Circle implements Shape {
         diameter = Math.sqrt(Math.pow(points[2] - points[0], 2) + Math.pow(points[3] - points[1], 2));
         centerX = points[0] - diameter / 2;
         centerY = points[1] - diameter / 2;
-    }
-
-    public Circle(double centerX, double centerY, double diameter, double borderSize, SColor fillColor, SColor borderColor, PaintMode paintMode) {
-        this.fillColor = fillColor;
-        this.borderColor = borderColor;
-        this.paintMode = paintMode;
-        this.borderSize = borderSize;
-
-        this.centerX = centerX;
-        this.centerY = centerY;
-        this.diameter = diameter;
     }
 
     @Override

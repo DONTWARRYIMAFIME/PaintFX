@@ -1,7 +1,6 @@
 package org.paintFX;
 
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.image.Image;
 
 import java.io.IOException;
@@ -19,8 +18,7 @@ public class Loader {
         return image;
     }
 
-    public static Parent loadFXML(String fxml) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource(fxml + ".fxml"));
-        return fxmlLoader.load();
+    public static FXMLLoader loadFXML(String fxml) throws IOException {
+        return new FXMLLoader(Main.class.getResource(fxml + ".fxml"));
     }
 }

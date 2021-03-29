@@ -1,5 +1,4 @@
-package org.paintFX;
-
+package org.paintFX.MainWindow;
 
 import javafx.scene.paint.Color;
 

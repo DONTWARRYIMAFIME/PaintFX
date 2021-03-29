@@ -1,4 +1,4 @@
-package org.paintFX;
+package org.paintFX.MainWindow;
 
 public enum PaintMode {
     CLEAR("Clear"),

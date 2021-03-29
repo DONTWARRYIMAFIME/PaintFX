@@ -1,4 +1,4 @@
-package org.paintFX;
+package org.paintFX.MainWindow;
 
 import javafx.application.Platform;
 import javafx.embed.swing.SwingFXUtils;
@@ -6,9 +6,13 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseButton;
+import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 
+import javafx.stage.FileChooser;
+import javafx.stage.Window;
+import org.paintFX.CreateCanvasWindow.CreateCanvasWindow;
 import org.paintFX.ShapeFactory.ShapeFactory;
 import org.paintFX.Shapes.Circle;
 import org.paintFX.Shapes.Rectangle;
@@ -18,22 +22,30 @@ import javax.imageio.ImageIO;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 public class Model {
 
+    private final FileChooser fileChooser = new FileChooser();
     private final List<Double> points = new ArrayList<>();
     private Composite components = new Composite();
 
+    private final Pane canvasPane;
     private final Canvas canvas;
     private final GraphicsContext g;
 
     private ShapeFactory shapeFactory;
     private PaintMode paintMode;
 
-    public Model(Canvas canvas) {
+
+
+    public Model(Pane canvasPane, Canvas canvas) {
+        this.canvasPane = canvasPane;
         this.canvas = canvas;
         this.g = canvas.getGraphicsContext2D();
+
+        initFileChooser();
     }
 
     public PaintMode getPaintMode() {
@@ -77,10 +89,15 @@ public class Model {
         canvas.setOnMouseDragged(e -> {
 
             double size = g.getLineWidth();
-            double x = e.getX() - size / 2;
-            double y = e.getY() - size / 2;
+            double x = e.getX();
+            double y = e.getY();
 
-            composite.addComponent(new Circle(x, y, size, size, new SColor((Color)g.getFill()), new SColor((Color)g.getFill()), PaintMode.FILLED));
+            composite.addComponent(new Circle
+                    (
+                        new double[] { x, y, x + size, y + size },
+                        size , new SColor((Color)g.getFill()),
+                        new SColor((Color)g.getFill()), PaintMode.FILLED
+                    ));
             composite.drawLast(g);
         });
 
@@ -100,7 +117,12 @@ public class Model {
             double x = e.getX() - size / 2;
             double y = e.getY() - size / 2;
 
-            composite.addComponent(new Rectangle(x, y, size, size, size, new SColor((Color)g.getFill()), new SColor((Color)g.getStroke()), PaintMode.CLEAR));
+            composite.addComponent(new Rectangle
+                    (
+                            new double[] { x, y, x + size, y + size },
+                            size, new SColor((Color)g.getFill()),
+                            new SColor((Color)g.getStroke()), PaintMode.CLEAR
+                    ));
             composite.drawLast(g);
         });
 
@@ -207,42 +229,112 @@ public class Model {
     }
 
     //Menu
-    public void onSerialize() {
+    public void onCreateCanvas() {
         try {
-            FileOutputStream fileOutputStream = new FileOutputStream("out/components.bin");
+            new CreateCanvasWindow(canvasPane, canvas);
+            clearCanvas();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void onSerialize(File selectedFile) {
+
+        try {
+            FileOutputStream fileOutputStream = new FileOutputStream(selectedFile.getAbsolutePath());
             ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
 
+            objectOutputStream.writeDouble(canvasPane.getMaxWidth());
+            objectOutputStream.writeDouble(canvasPane.getMaxHeight());
             objectOutputStream.writeObject(components);
 
-            fileOutputStream.close();
+            fileChooser.setInitialDirectory(selectedFile.getParentFile());
 
         } catch (IOException e) {
             e.printStackTrace();
+        } catch (NullPointerException e1) {
+            System.out.println("File is not valid");
         }
     }
 
     public void onDeserialize() {
+        Window stage = canvas.getScene().getWindow();
+
+        fileChooser.setTitle("Open Resource File");
+        fileChooser.getExtensionFilters().clear();
+        fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("Binary files", "*.bin"));
+
+        File selectedFile = fileChooser.showOpenDialog(stage);
+
         try {
-            FileInputStream fileInputStream = new FileInputStream("out/components.bin");
+            FileInputStream fileInputStream = new FileInputStream(selectedFile.getAbsolutePath());
             ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
 
+            double width = objectInputStream.readDouble();
+            double height = objectInputStream.readDouble();
+
+            resizePane(width, height);
+            resizeCanvas(width, height);
+
+            clearCanvas();
             components = (Composite) objectInputStream.readObject();
             components.draw(g);
 
-            fileInputStream.close();
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
+        } catch (NullPointerException e1) {
+            System.out.println("File is not valid");
         }
+
+    }
+
+    private void resizePane(double width, double height) {
+        canvasPane.setMaxWidth(width);
+        canvasPane.setMaxHeight(height);
+    }
+
+    private void resizeCanvas(double width, double height) {
+        canvas.setWidth(width);
+        canvas.setHeight(height);
     }
 
     public void onSave(Canvas canvas) {
+        Window stage = canvas.getScene().getWindow();
+
+        fileChooser.setTitle("Save Dialog");
+        fileChooser.setInitialFileName("picture");
+        fileChooser.getExtensionFilters().clear();
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Binary files", "*.bin"),
+                new FileChooser.ExtensionFilter("PNG", "*.png")
+                //new FileChooser.ExtensionFilter("JPEG", "*.jpeg", "*.jpg")
+        );
+
+        File selectedFile = fileChooser.showSaveDialog(stage);
+
+        if (selectedFile != null) {
+            String fileName = selectedFile.getName();
+            String fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1, selectedFile.getName().length());
+
+            System.out.format("Name: %s ; Extension: %s", fileName,fileExtension);
+
+            if (Objects.equals(fileExtension, "bin")) {
+                onSerialize(selectedFile);
+            } else {
+                savePicture(selectedFile.getAbsolutePath(), fileExtension);
+            }
+
+            fileChooser.setInitialDirectory(selectedFile.getParentFile());
+        } else {
+            System.out.println("File is not valid");
+        }
+
+    }
+
+    private void savePicture(String path, String fileExtension) {
         try {
-            String path = "out";
-
-            new File(path).mkdir();
-
             Image snapshot = canvas.snapshot(null, null);
-            ImageIO.write(SwingFXUtils.fromFXImage(snapshot, null), "png", new File(path + "/" + "paint.png"));
+            ImageIO.write(SwingFXUtils.fromFXImage(snapshot, null), fileExtension, new File(path));
 
             System.out.println("File saved successfully");
         } catch (Exception e) {
@@ -252,6 +344,11 @@ public class Model {
 
     public void onExit() {
         Platform.exit();
+    }
+
+    private void initFileChooser() {
+        fileChooser.setInitialDirectory(new File("out/"));
+
     }
 
 }

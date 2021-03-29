@@ -1,7 +1,7 @@
 package org.paintFX.ShapeFactory;
 
-import org.paintFX.PaintMode;
-import org.paintFX.SColor;
+import org.paintFX.MainWindow.PaintMode;
+import org.paintFX.MainWindow.SColor;
 import org.paintFX.Shapes.Polygon;
 import org.paintFX.Shapes.Shape;
 

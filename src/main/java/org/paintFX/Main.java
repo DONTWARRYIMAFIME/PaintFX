@@ -16,7 +16,7 @@ public class Main extends Application {
     public void start(Stage stage) throws IOException {
 
         String title = "Version - 0.08";
-        Scene scene = new Scene(Loader.loadFXML("Scenes/MainScene"));
+        Scene scene = new Scene(Loader.loadFXML("Scenes/MainScene").load());
 
         stage.setTitle(title);
         stage.getIcons().add(Loader.loadImage("icon.png"));

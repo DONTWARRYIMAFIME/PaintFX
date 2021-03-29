@@ -1,11 +1,10 @@
-package org.paintFX;
+package org.paintFX.CreateCanvasWindow;
 
-import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
-import javafx.scene.control.TextFormatter;
+import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
 import java.util.regex.Pattern;
@@ -13,6 +12,7 @@ import java.util.regex.Pattern;
 public class CreateCanvasSceneController {
 
     private final Pattern pattern = Pattern.compile("\\d{1,4}");
+    private Pane canvasPane;
     private Canvas canvas;
 
     @FXML
@@ -40,14 +40,30 @@ public class CreateCanvasSceneController {
 
     }
 
+    public void setCanvasPane(Pane canvasPane) {
+        this.canvasPane = canvasPane;
+    }
     public void setCanvas(Canvas canvas) {
         this.canvas = canvas;
     }
 
     public void onCreateCanvas() {
-        canvas.setWidth(Double.parseDouble(canvasWidth.getText()));
-        canvas.setHeight(Double.parseDouble(canvasHeight.getText()));
+        double width = Double.parseDouble(canvasWidth.getText());
+        double height = Double.parseDouble(canvasHeight.getText());
+
+        resizePane(width, height);
+        resizeCanvas(width, height);
         closeStage();
+    }
+
+    private void resizePane(double width, double height) {
+        canvasPane.setMaxWidth(width);
+        canvasPane.setMaxHeight(height);
+    }
+
+    private void resizeCanvas(double width, double height) {
+        canvas.setWidth(width);
+        canvas.setHeight(height);
     }
 
     private void closeStage() {
