@@ -1,32 +1,40 @@
 package org.paintFX.Shapes;
 
 import javafx.scene.canvas.GraphicsContext;
-import org.paintFX.MainWindow.PaintMode;
-import org.paintFX.MainWindow.SColor;
+import org.paintFX.core.PaintMode;
+import org.paintFX.core.Point;
+import org.paintFX.core.SColor;
+import org.paintFX.core.Shape;
+
+import java.util.List;
 
 public class Rectangle implements Shape {
+
+    private final int requiredPointsCount = 2;
+    private final Point leftCorner = new Point();
+    private double width;
+    private double height;
 
     private final double borderSize;
     private final SColor fillColor;
     private final SColor borderColor;
     private final PaintMode paintMode;
 
-    private final double leftCornerX;
-    private final double leftCornerY;
-    private final double width;
-    private final double height;
-
-    public Rectangle(double[] points, double borderSize, SColor fillColor, SColor borderColor, PaintMode paintMode) {
+    public Rectangle(double borderSize, SColor fillColor, SColor borderColor, PaintMode paintMode) {
         this.fillColor = fillColor;
         this.borderColor = borderColor;
         this.paintMode = paintMode;
         this.borderSize = borderSize;
+    }
 
-        leftCornerX = Math.min(points[0], points[2]);
-        leftCornerY = Math.min(points[1], points[3]);
+    @Override
+    public boolean isContinue(int placedPointsCount) {
+        return requiredPointsCount == 0 ? true : placedPointsCount < requiredPointsCount;
+    }
 
-        width = Math.abs(points[0] - points[2]);
-        height = Math.abs(points[1] - points[3]);
+    @Override
+    public boolean isInfinite() {
+        return requiredPointsCount == 0;
     }
 
     @Override
@@ -38,23 +46,32 @@ public class Rectangle implements Shape {
 
         switch (paintMode) {
             case CLEAR:
-                g.clearRect(leftCornerX, leftCornerY, width, height);
+                g.clearRect(leftCorner.getX(), leftCorner.getY(), width, height);
                 break;
             case FILLED:
-                g.fillRect(leftCornerX, leftCornerY, width, height);
+                g.fillRect(leftCorner.getX(), leftCorner.getY(), width, height);
                 break;
             case BORDERED:
-                g.strokeRect(leftCornerX, leftCornerY, width, height);
+                g.strokeRect(leftCorner.getX(), leftCorner.getY(), width, height);
                 break;
             case FILLED_WITH_BORDER:
-                g.fillRect(leftCornerX, leftCornerY, width, height);
-                g.strokeRect(leftCornerX, leftCornerY, width, height);
+                g.fillRect(leftCorner.getX(), leftCorner.getY(), width, height);
+                g.strokeRect(leftCorner.getX(), leftCorner.getY(), width, height);
                 break;
             default:
                 System.out.println("Unknown paint mode");
                 break;
         }
 
+    }
+
+    @Override
+    public void setPoints(List<Point> points) {
+        leftCorner.setX(Math.min(points.get(0).getX(), points.get(1).getX()));
+        leftCorner.setY(Math.min(points.get(0).getY(), points.get(1).getY()));
+
+        width = Math.abs(points.get(0).getX() - points.get(1).getX());
+        height = Math.abs(points.get(0).getY() - points.get(1).getY());
     }
 
 }

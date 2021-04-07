@@ -2,10 +2,12 @@ package org.paintFX.MainWindow;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Paint;
-import org.paintFX.Shapes.Shape;
+import org.paintFX.core.Point;
+import org.paintFX.core.Shape;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.List;
 
 public class Composite implements Shape {
     private final Deque<Shape> components = new ArrayDeque<>();
@@ -15,8 +17,8 @@ public class Composite implements Shape {
         components.offerLast(component);
     }
 
-    public Shape removeComponent() {
-        return components.pollLast();
+    public Shape getLastComponent() {
+        return components.peekLast();
     }
 
     public void undoComponent() {
@@ -39,8 +41,28 @@ public class Composite implements Shape {
         memory.clear();
     }
 
+    public void removeLastComponent() {
+        components.pollLast();
+    }
+
     public void removeAllComponents() {
         components.clear();
+    }
+
+    @Override
+    public boolean isContinue(int placedPointsCount) {
+        return getLastComponent().isContinue(placedPointsCount);
+    }
+
+    @Override
+    public boolean isInfinite() {
+        return getLastComponent().isInfinite();
+    }
+
+
+    @Override
+    public void setPoints(List<Point> points) {
+        getLastComponent().setPoints(points);
     }
 
     @Override

@@ -13,22 +13,20 @@ import javafx.scene.paint.Paint;
 import javafx.stage.FileChooser;
 import javafx.stage.Window;
 import org.paintFX.CreateCanvasWindow.CreateCanvasWindow;
-import org.paintFX.ShapeFactory.ShapeFactory;
+import org.paintFX.core.*;
 import org.paintFX.Shapes.Circle;
 import org.paintFX.Shapes.Rectangle;
-import org.paintFX.Shapes.Shape;
 
 import javax.imageio.ImageIO;
 import java.io.*;
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Stream;
 
 public class Model {
 
     private final FileChooser fileChooser = new FileChooser();
-    private final List<Double> points = new ArrayList<>();
+    private final List<Point> points = new LinkedList<>();
     private Composite components = new Composite();
 
     private final Pane canvasPane;
@@ -37,7 +35,6 @@ public class Model {
 
     private ShapeFactory shapeFactory;
     private PaintMode paintMode;
-
 
 
     public Model(Pane canvasPane, Canvas canvas) {
@@ -53,12 +50,11 @@ public class Model {
     }
 
     public void addPoint(double x, double y) {
-        points.add(x);
-        points.add(y);
+        points.add(new Point(x, y));
 
         System.out.format(
                 "Point %d:  X - %.01f |    Y - %.01f\n",
-                points.size() / 2,
+                points.size(),
                 x, y
         );
     }
@@ -87,17 +83,21 @@ public class Model {
         Composite composite = new Composite();
 
         canvas.setOnMouseDragged(e -> {
-
             double size = g.getLineWidth();
+
             double x = e.getX();
             double y = e.getY();
 
+            List<Point> temp = new LinkedList<>();
+            temp.add(new Point(x , y));
+            temp.add(new Point(x + size , y + size));
+
             composite.addComponent(new Circle
                     (
-                        new double[] { x, y, x + size, y + size },
-                        size , new SColor((Color)g.getFill()),
+                        size, new SColor((Color)g.getFill()),
                         new SColor((Color)g.getFill()), PaintMode.FILLED
                     ));
+            composite.setPoints(temp);
             composite.drawLast(g);
         });
 
@@ -117,12 +117,16 @@ public class Model {
             double x = e.getX() - size / 2;
             double y = e.getY() - size / 2;
 
+            List<Point> temp = new LinkedList<>();
+            temp.add(new Point(x , y));
+            temp.add(new Point(x + size , y + size));
+
             composite.addComponent(new Rectangle
                     (
-                            new double[] { x, y, x + size, y + size },
-                            size, new SColor((Color)g.getFill()),
-                            new SColor((Color)g.getStroke()), PaintMode.CLEAR
+                        size, new SColor((Color)g.getFill()),
+                        new SColor((Color)g.getStroke()), PaintMode.CLEAR
                     ));
+            composite.setPoints(temp);
             composite.drawLast(g);
         });
 
@@ -140,55 +144,44 @@ public class Model {
         components.clearMemory();
     }
 
-
-    public void bindMouseForDrawingRegularShapes() {
-        canvas.setOnMousePressed(e -> addPoint(e.getX(), e.getY()));
-
-        canvas.setOnMouseReleased(e -> {
-            addPoint(e.getX(), e.getY());
-            components.addComponent(createShapeByPoints());
-            components.drawLast(g);
-
-            components.clearMemory();
-            clearPoints();
-        });
-
-        canvas.setOnMouseDragged(e -> {
-            clearCanvas();
-            addPoint(e.getX(), e.getY());
-            components.addComponent(createShapeByPoints());
-            removeLastPoint();
-            components.draw(g);
-            components.removeComponent();
-        });
-    }
-
-    public void bindMouseDrawingDifficultShape() {
+    public void bindMouseForDrawingShapes() {
         canvas.setOnMousePressed(e -> {
+            addPoint(e.getX(), e.getY());
             if (e.getButton() == MouseButton.PRIMARY) {
-                addPoint(e.getX(), e.getY());
-            } else if (e.getButton() == MouseButton.SECONDARY) {
-                if (points.size() > 0) {
+
+                if (points.size() == 1) {
                     addPoint(e.getX(), e.getY());
                     components.addComponent(createShapeByPoints());
-                    components.drawLast(g);
-
-                    components.clearMemory();
-                    clearPoints();
                 } else {
-                    System.out.println("Polygon will be invisible. Put more points");
+                    if (!components.getLastComponent().isContinue(points.size() - 1)) {
+                        components.clearMemory();
+                        clearPoints();
+                   }
                 }
+
+            } else if (e.getButton() == MouseButton.SECONDARY) {
+
+                if (!components.isInfinite() && components.getLastComponent().isContinue(points.size() - 1)) {
+                    components.removeLastComponent();
+                }
+
+                clearCanvas();
+                components.draw(g);
+                components.clearMemory();
+                clearPoints();
             }
         });
 
         canvas.setOnMouseMoved(e -> {
             if (points.size() > 0) {
                 clearCanvas();
-                addPoint(e.getX(), e.getY());
-                components.addComponent(createShapeByPoints());
+
                 removeLastPoint();
+                addPoint(e.getX(), e.getY());
+
+                components.setPoints(points);
+
                 components.draw(g);
-                components.removeComponent();
             }
         });
     }
@@ -200,11 +193,7 @@ public class Model {
     }
 
     private Shape createShapeByPoints() {
-        Double[] arr = new Double[points.size()];
-        points.toArray(arr);
-
-        double[] points = Stream.of(arr).mapToDouble(Double::doubleValue).toArray();
-        return shapeFactory.createShape(points, g.getLineWidth(), new SColor((Color)g.getFill()), new SColor((Color)g.getStroke()), paintMode);
+        return shapeFactory.createShape(g.getLineWidth(), new SColor((Color)g.getFill()), new SColor((Color)g.getStroke()), paintMode);
     }
 
     public void onUndo() {
@@ -224,8 +213,7 @@ public class Model {
     }
 
     private void removeLastPoint() {
-        points.remove(points.size() - 1); //X
-        points.remove(points.size() - 1); //Y
+        points.remove(points.size() - 1);
     }
 
     //Menu
