@@ -1,7 +1,7 @@
-package org.paintFX.ShapeFactory;
+package org.paintFX.shapeFactory;
 
 import org.paintFX.core.*;
-import org.paintFX.Shapes.Rectangle;
+import org.paintFX.shapes.Rectangle;
 
 public class RectangleFactory implements ShapeFactory {
     @Override

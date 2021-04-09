@@ -1,24 +1,18 @@
-package org.paintFX.MainWindow;
+package org.paintFX.mainWindow;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Paint;
-import org.paintFX.core.Point;
-import org.paintFX.core.Shape;
+import org.paintFX.core.Drawable;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
-import java.util.List;
 
-public class Composite implements Shape {
-    private final Deque<Shape> components = new ArrayDeque<>();
-    private final Deque<Shape> memory = new ArrayDeque<>();
+public class Composite implements Drawable {
+    private final Deque<Drawable> components = new ArrayDeque<>();
+    private final Deque<Drawable> memory = new ArrayDeque<>();
 
-    public void addComponent(Shape component) {
+    public void addComponent(Drawable component) {
         components.offerLast(component);
-    }
-
-    public Shape getLastComponent() {
-        return components.peekLast();
     }
 
     public void undoComponent() {
@@ -41,28 +35,8 @@ public class Composite implements Shape {
         memory.clear();
     }
 
-    public void removeLastComponent() {
-        components.pollLast();
-    }
-
     public void removeAllComponents() {
         components.clear();
-    }
-
-    @Override
-    public boolean isContinue(int placedPointsCount) {
-        return getLastComponent().isContinue(placedPointsCount);
-    }
-
-    @Override
-    public boolean isInfinite() {
-        return getLastComponent().isInfinite();
-    }
-
-
-    @Override
-    public void setPoints(List<Point> points) {
-        getLastComponent().setPoints(points);
     }
 
     @Override
@@ -72,7 +46,7 @@ public class Composite implements Shape {
         Paint currentFillColor = g.getFill();
         Paint currentBorderColor = g.getStroke();
 
-        for (Shape component : components) {
+        for (Drawable component : components) {
             component.draw(g);
         }
 

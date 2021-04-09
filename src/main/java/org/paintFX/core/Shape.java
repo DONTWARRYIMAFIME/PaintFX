@@ -2,17 +2,41 @@ package org.paintFX.core;
 
 import javafx.scene.canvas.GraphicsContext;
 
-import java.io.Serializable;
 import java.util.List;
 
-public interface Shape extends Serializable {
+public abstract class Shape implements Drawable {
 
-    boolean isContinue(int placedPointsCount);
+    protected int requiredPointsCount;
 
-    boolean isInfinite();
+    protected double borderSize;
+    protected SColor fillColor;
+    protected SColor borderColor;
+    protected PaintMode paintMode;
 
-    void draw(GraphicsContext g);
+    public Shape(double borderSize, SColor fillColor, SColor borderColor, PaintMode paintMode) {
+        this.fillColor = fillColor;
+        this.borderColor = borderColor;
+        this.paintMode = paintMode;
+        this.borderSize = borderSize;
+    }
 
-    void setPoints(List<Point> points);
+    public boolean isContinue(int placedPointsCount) {
+        return requiredPointsCount == 0 ? true : placedPointsCount < requiredPointsCount;
+    }
 
+    public boolean isInfinite() {
+        return requiredPointsCount == 0;
+    }
+
+    public void setPaintSettings(double borderSize, SColor fillColor, SColor borderColor, PaintMode paintMode) {
+        this.borderSize = borderSize;
+        this.fillColor = fillColor;
+        this.borderColor = borderColor;
+        this.paintMode = paintMode;
+    }
+
+    public abstract void setPoints(List<Point> points);
+
+    @Override
+    public abstract void draw(GraphicsContext g);
 }

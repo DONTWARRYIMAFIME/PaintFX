@@ -1,7 +1,7 @@
-package org.paintFX.ShapeFactory;
+package org.paintFX.shapeFactory;
 
 import org.paintFX.core.*;
-import org.paintFX.Shapes.Polygon;
+import org.paintFX.shapes.Polygon;
 
 public class PolygonFactory implements ShapeFactory {
     @Override

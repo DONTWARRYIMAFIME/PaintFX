@@ -1,11 +1,11 @@
-package org.paintFX.ShapeFactory;
+package org.paintFX.shapeFactory;
 
 import org.paintFX.core.*;
-import org.paintFX.Shapes.Line;
+import org.paintFX.shapes.Line;
 
 public class LineFactory implements ShapeFactory {
     @Override
     public Shape createShape(double borderSize, SColor fillColor, SColor borderColor, PaintMode paintMode) {
-        return new Line(borderSize, borderColor, paintMode);
+        return new Line(borderSize, fillColor, borderColor, paintMode);
     }
 }

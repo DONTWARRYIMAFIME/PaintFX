@@ -1,7 +1,7 @@
-package org.paintFX.ShapeFactory;
+package org.paintFX.shapeFactory;
 
 import org.paintFX.core.*;
-import org.paintFX.Shapes.Circle;
+import org.paintFX.shapes.Circle;
 
 public class CircleFactory implements ShapeFactory {
     @Override

@@ -1,7 +1,7 @@
-package org.paintFX.ShapeFactory;
+package org.paintFX.shapeFactory;
 
 import org.paintFX.core.*;
-import org.paintFX.Shapes.Ellipse;
+import org.paintFX.shapes.Ellipse;
 
 public class EllipseFactory implements ShapeFactory {
     @Override

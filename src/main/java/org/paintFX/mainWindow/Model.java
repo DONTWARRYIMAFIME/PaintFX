@@ -1,4 +1,4 @@
-package org.paintFX.MainWindow;
+package org.paintFX.mainWindow;
 
 import javafx.application.Platform;
 import javafx.embed.swing.SwingFXUtils;
@@ -12,10 +12,10 @@ import javafx.scene.paint.Paint;
 
 import javafx.stage.FileChooser;
 import javafx.stage.Window;
-import org.paintFX.CreateCanvasWindow.CreateCanvasWindow;
+import org.paintFX.createCanvasWindow.CreateCanvasWindow;
 import org.paintFX.core.*;
-import org.paintFX.Shapes.Circle;
-import org.paintFX.Shapes.Rectangle;
+import org.paintFX.shapes.Circle;
+import org.paintFX.shapes.Rectangle;
 
 import javax.imageio.ImageIO;
 import java.io.*;
@@ -27,6 +27,7 @@ public class Model {
 
     private final FileChooser fileChooser = new FileChooser();
     private final List<Point> points = new LinkedList<>();
+    private Shape newShape = null;
     private Composite components = new Composite();
 
     private final Pane canvasPane;
@@ -52,11 +53,11 @@ public class Model {
     public void addPoint(double x, double y) {
         points.add(new Point(x, y));
 
-        System.out.format(
-                "Point %d:  X - %.01f |    Y - %.01f\n",
-                points.size(),
-                x, y
-        );
+//        System.out.format(
+//                "Point %d:  X - %.01f |    Y - %.01f\n",
+//                points.size(),
+//                x, y
+//        );
     }
 
     public void setPaintMode(PaintMode paintMode) { this.paintMode = paintMode; }
@@ -73,6 +74,14 @@ public class Model {
 
     public void setBorderSize(double size) {
         g.setLineWidth(size);
+    }
+
+    public boolean isPainting() {
+        return newShape != null;
+    }
+
+    public void setPaintSettings() {
+        newShape.setPaintSettings(g.getLineWidth(), new SColor((Color)g.getFill()), new SColor((Color)g.getStroke()), paintMode);
     }
 
     public String showMouseCoordinates(double x, double y) {
@@ -92,12 +101,14 @@ public class Model {
             temp.add(new Point(x , y));
             temp.add(new Point(x + size , y + size));
 
-            composite.addComponent(new Circle
-                    (
-                        size, new SColor((Color)g.getFill()),
-                        new SColor((Color)g.getFill()), PaintMode.FILLED
-                    ));
-            composite.setPoints(temp);
+            Shape circle = new Circle(
+                    size, new SColor((Color)g.getFill()),
+                    new SColor((Color)g.getStroke()), PaintMode.FILLED
+            );
+
+            circle.setPoints(temp);
+
+            composite.addComponent(circle);
             composite.drawLast(g);
         });
 
@@ -121,12 +132,14 @@ public class Model {
             temp.add(new Point(x , y));
             temp.add(new Point(x + size , y + size));
 
-            composite.addComponent(new Rectangle
-                    (
-                        size, new SColor((Color)g.getFill()),
-                        new SColor((Color)g.getStroke()), PaintMode.CLEAR
-                    ));
-            composite.setPoints(temp);
+            Shape rectangle = new Rectangle(
+                    size, new SColor((Color)g.getFill()),
+                    new SColor((Color)g.getStroke()), PaintMode.CLEAR
+            );
+
+            rectangle.setPoints(temp);
+
+            composite.addComponent(rectangle);
             composite.drawLast(g);
         });
 
@@ -145,30 +158,35 @@ public class Model {
     }
 
     public void bindMouseForDrawingShapes() {
+
+        newShape = null;
+        clearPoints();
+        clearCanvas();
+        components.draw(g);
+
+        newShape = createShape();
+
         canvas.setOnMousePressed(e -> {
             addPoint(e.getX(), e.getY());
             if (e.getButton() == MouseButton.PRIMARY) {
 
-                if (points.size() == 1) {
-                    addPoint(e.getX(), e.getY());
-                    components.addComponent(createShapeByPoints());
-                } else {
-                    if (!components.getLastComponent().isContinue(points.size() - 1)) {
-                        components.clearMemory();
-                        clearPoints();
-                   }
+                if (!newShape.isContinue(points.size())) {
+                    components.addComponent(newShape);
+
+                    components.clearMemory();
+                    clearPoints();
+                    bindMouseForDrawingShapes();
                 }
 
             } else if (e.getButton() == MouseButton.SECONDARY) {
 
-                if (!components.isInfinite() && components.getLastComponent().isContinue(points.size() - 1)) {
-                    components.removeLastComponent();
+                if (newShape.isInfinite() || !newShape.isContinue(points.size())) {
+                    components.addComponent(newShape);
                 }
 
-                clearCanvas();
-                components.draw(g);
-                components.clearMemory();
                 clearPoints();
+                components.clearMemory();
+                bindMouseForDrawingShapes();
             }
         });
 
@@ -176,12 +194,12 @@ public class Model {
             if (points.size() > 0) {
                 clearCanvas();
 
-                removeLastPoint();
                 addPoint(e.getX(), e.getY());
-
-                components.setPoints(points);
+                newShape.setPoints(points);
+                removeLastPoint();
 
                 components.draw(g);
+                newShape.draw(g);
             }
         });
     }
@@ -192,7 +210,7 @@ public class Model {
         canvas.setOnMouseDragged(e -> {});
     }
 
-    private Shape createShapeByPoints() {
+    private Shape createShape() {
         return shapeFactory.createShape(g.getLineWidth(), new SColor((Color)g.getFill()), new SColor((Color)g.getStroke()), paintMode);
     }
 

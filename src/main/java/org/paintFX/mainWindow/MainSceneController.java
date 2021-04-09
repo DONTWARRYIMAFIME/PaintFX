@@ -1,4 +1,4 @@
-package org.paintFX.MainWindow;
+package org.paintFX.mainWindow;
 
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
@@ -9,7 +9,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import org.paintFX.Loader;
-import org.paintFX.ShapeFactory.*;
+import org.paintFX.shapeFactory.*;
 import org.paintFX.core.IService;
 import org.paintFX.core.PaintMode;
 
@@ -130,8 +130,9 @@ public class MainSceneController {
                 lblTool.setText("Tool : " + service.getToolName());
 
                 resetMouseEvents();
-                model.bindMouseForDrawingShapes();
+
                 model.setShapeFactory(service.createFactory());
+                model.bindMouseForDrawingShapes();
             });
 
             toolBox.getChildren().add(button);
@@ -186,14 +187,23 @@ public class MainSceneController {
 
     public void setFillColor() {
         model.setFillColor(cpFill.getValue());
+        if (model.isPainting()) {
+            model.setPaintSettings();
+        }
     }
 
     public void setBorderColor() {
         model.setBorderColor(cpBorder.getValue());
+        if (model.isPainting()) {
+            model.setPaintSettings();
+        }
     }
 
     public void setBorderSize() {
         model.setBorderSize(Double.parseDouble(brushSize.getText()));
+        if (model.isPainting()) {
+            model.setPaintSettings();
+        }
     }
 
     private void resetMouseEvents() {
@@ -223,48 +233,54 @@ public class MainSceneController {
         lblTool.setText("Tool : 'Rectangle' ");
 
         resetMouseEvents();
-        model.bindMouseForDrawingShapes();
+
         model.setShapeFactory(new RectangleFactory());
+        model.bindMouseForDrawingShapes();
     }
 
     public void setShapeFactoryToCircle() {
         lblTool.setText("Tool : 'Circle' ");
 
         resetMouseEvents();
-        model.bindMouseForDrawingShapes();
+
         model.setShapeFactory(new CircleFactory());
+        model.bindMouseForDrawingShapes();
     }
 
     public void setShapeFactoryToEllipse() {
         lblTool.setText("Tool : 'Ellipse' ");
 
         resetMouseEvents();
-        model.bindMouseForDrawingShapes();
+
         model.setShapeFactory(new EllipseFactory());
+        model.bindMouseForDrawingShapes();
     }
 
     public void setShapeFactoryToLine() {
         lblTool.setText("Tool : 'Line' ");
 
         resetMouseEvents();
-        model.bindMouseForDrawingShapes();
+
         model.setShapeFactory(new LineFactory());
+        model.bindMouseForDrawingShapes();
     }
 
     public void setShapeFactoryToPolygon() {
         lblTool.setText("Tool : 'Polygon' ");
 
         resetMouseEvents();
-        model.bindMouseForDrawingShapes();
+
         model.setShapeFactory(new PolygonFactory());
+        model.bindMouseForDrawingShapes();
     }
 
     public void setShapeFactoryToTrapezium() {
         lblTool.setText("Tool : 'Trapezium' ");
 
         resetMouseEvents();
-        model.bindMouseForDrawingShapes();
+
         model.setShapeFactory(new TrapeziumFactory());
+        model.bindMouseForDrawingShapes();
     }
 
     public void onSwap() {
@@ -292,16 +308,25 @@ public class MainSceneController {
     public void setPaintModeToFilled() {
         model.setPaintMode(PaintMode.FILLED);
         setPaintModeLabel();
+        if (model.isPainting()) {
+            model.setPaintSettings();
+        }
     }
 
     public void setPaintModeToBordered() {
         model.setPaintMode(PaintMode.BORDERED);
         setPaintModeLabel();
+        if (model.isPainting()) {
+            model.setPaintSettings();
+        }
     }
 
     public void setPaintModeToFilledWithBorder() {
         model.setPaintMode(PaintMode.FILLED_WITH_BORDER);
         setPaintModeLabel();
+        if (model.isPainting()) {
+            model.setPaintSettings();
+        }
     }
 
     public void setPaintModeLabel() {

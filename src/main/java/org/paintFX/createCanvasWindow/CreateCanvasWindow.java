@@ -1,4 +1,4 @@
-package org.paintFX.CreateCanvasWindow;
+package org.paintFX.createCanvasWindow;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
