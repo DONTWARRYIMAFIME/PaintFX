@@ -53,11 +53,11 @@ public class Model {
     public void addPoint(double x, double y) {
         points.add(new Point(x, y));
 
-//        System.out.format(
-//                "Point %d:  X - %.01f |    Y - %.01f\n",
-//                points.size(),
-//                x, y
-//        );
+        System.out.format(
+                "Point %d:  X - %.01f |    Y - %.01f\n",
+                points.size(),
+                x, y
+        );
     }
 
     public void setPaintMode(PaintMode paintMode) { this.paintMode = paintMode; }

@@ -1,11 +1,14 @@
 package org.paintFX.mainWindow;
 
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import org.paintFX.Loader;
@@ -84,13 +87,13 @@ public class MainSceneController {
     private ToggleButton btnRectangle;
 
     @FXML
-    private ToggleButton btnTrapezium;
-
-    @FXML
     private ToggleGroup paintMode;
 
     @FXML
     private ToggleGroup tools;
+
+    @FXML
+    private HBox lastBox;
 
     @FXML
     private VBox toolBox;
@@ -122,10 +125,14 @@ public class MainSceneController {
 
         // Найдём все реализации сервиса IService в слое плагинов и в слое Boot
         List<IService> services = IService.getServices(layer);
+
+        HBox hBox = null;
+        int iterator = 0;
         for (IService service : services) {
             ToggleButton button = new ToggleButton();
             button.setToggleGroup(tools);
             button.setGraphic(new ImageView(service.getIcon()));
+            //button.setText(service.getToolName());
             button.setOnAction(e -> {
                 lblTool.setText("Tool : " + service.getToolName());
 
@@ -135,7 +142,22 @@ public class MainSceneController {
                 model.bindMouseForDrawingShapes();
             });
 
-            toolBox.getChildren().add(button);
+            if (lastBox.getChildren().size() < 2) {
+                lastBox.getChildren().add(button);
+            } else {
+                if (iterator % 2 == 0) {
+                    hBox = new HBox();
+                    hBox.setAlignment(Pos.CENTER);
+                    hBox.setSpacing(5);
+                    hBox.setPadding(new Insets(5, 0, 5, 0));
+                    toolBox.getChildren().add(hBox);
+                }
+
+                hBox.getChildren().add(button);
+
+                iterator++;
+            }
+
         }
     }
 
@@ -145,9 +167,7 @@ public class MainSceneController {
         model = new Model(canvasPane, canvas);
 
         //TextField pattern
-        TextFormatter<?> formatter = new TextFormatter<>(change -> {
-            return pattern.matcher(change.getControlNewText()).matches() ? change : null;
-        });
+        TextFormatter<?> formatter = new TextFormatter<>(change -> pattern.matcher(change.getControlNewText()).matches() ? change : null);
         brushSize.setTextFormatter(formatter);
 
         //Icons for tools
@@ -162,10 +182,7 @@ public class MainSceneController {
         btnPolygon.setGraphic(new ImageView(Loader.loadImage("icons/polygon.png")));
         btnRectangle.setGraphic(new ImageView(Loader.loadImage("icons/rectangle.png")));
 
-        btnTrapezium.setGraphic(new ImageView(Loader.loadImage("icons/trapezium.png")));
-
-        btnRectangle.setGraphic(new ImageView(Loader.loadImage("icons/rectangle.png")));
-        //loadPlugins();
+        loadPlugins();
 
         setFillColor();
         setBorderColor();
@@ -271,15 +288,6 @@ public class MainSceneController {
         resetMouseEvents();
 
         model.setShapeFactory(new PolygonFactory());
-        model.bindMouseForDrawingShapes();
-    }
-
-    public void setShapeFactoryToTrapezium() {
-        lblTool.setText("Tool : 'Trapezium' ");
-
-        resetMouseEvents();
-
-        model.setShapeFactory(new TrapeziumFactory());
         model.bindMouseForDrawingShapes();
     }
 

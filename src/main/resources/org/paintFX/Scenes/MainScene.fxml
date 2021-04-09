@@ -33,7 +33,7 @@
          <ToolBar>
             <HBox alignment="CENTER" spacing="5">
                <children>
-                  <TextField fx:id="brushSize" onInputMethodTextChanged="#setBorderSize" onKeyReleased="#setBorderSize" prefHeight="26.0" prefWidth="52.0" text="18" />
+                  <TextField fx:id="brushSize" onInputMethodTextChanged="#setBorderSize" onKeyReleased="#setBorderSize" prefHeight="26.0" prefWidth="52.0" text="12" />
                   <ColorPicker fx:id="cpFill" onAction="#setFillColor" prefHeight="26.0" prefWidth="90.0" />
                   <ColorPicker fx:id="cpBorder" onAction="#setBorderColor" prefHeight="26.0" prefWidth="90.0" />
                   <Button fx:id="btnSwap" mnemonicParsing="false" onAction="#onSwap" text="Swap" />
@@ -104,8 +104,11 @@
                   <ToggleButton fx:id="btnEraser" mnemonicParsing="false" onAction="#setEraserTool" style="-fx-background-image: url(&quot;icons/eraser.png&quot;);" toggleGroup="$tools" />
                </children>
                <VBox.margin>
-                  <Insets bottom="5.0" top="5.0" />
+                  <Insets />
                </VBox.margin>
+               <padding>
+                  <Insets bottom="5.0" top="5.0" />
+               </padding>
             </HBox>
             <HBox alignment="CENTER" spacing="5">
                <children>
@@ -113,8 +116,11 @@
                   <ToggleButton fx:id="btnEllipse" mnemonicParsing="false" onAction="#setShapeFactoryToEllipse" toggleGroup="$tools" />
                </children>
                <VBox.margin>
-                  <Insets bottom="5.0" top="5.0" />
+                  <Insets />
                </VBox.margin>
+               <padding>
+                  <Insets bottom="5.0" top="5.0" />
+               </padding>
             </HBox>
             <HBox alignment="CENTER" spacing="5">
                <children>
@@ -122,17 +128,22 @@
                   <ToggleButton fx:id="btnPolygon" mnemonicParsing="false" onAction="#setShapeFactoryToPolygon" toggleGroup="$tools" />
                </children>
                <VBox.margin>
-                  <Insets bottom="5.0" top="5.0" />
+                  <Insets />
                </VBox.margin>
+               <padding>
+                  <Insets bottom="5.0" top="5.0" />
+               </padding>
             </HBox>
-            <HBox alignment="CENTER" spacing="5">
+            <HBox fx:id="lastBox" alignment="CENTER" spacing="5">
                <children>
                   <ToggleButton fx:id="btnRectangle" mnemonicParsing="false" onAction="#setShapeFactoryToRectangle" toggleGroup="$tools" />
-                  <ToggleButton fx:id="btnTrapezium" mnemonicParsing="false" onAction="#setShapeFactoryToTrapezium" toggleGroup="$tools" />
                </children>
                <VBox.margin>
-                  <Insets bottom="5.0" top="5.0" />
+                  <Insets />
                </VBox.margin>
+               <padding>
+                  <Insets bottom="5.0" top="5.0" />
+               </padding>
             </HBox>
          </children>
          <BorderPane.margin>
