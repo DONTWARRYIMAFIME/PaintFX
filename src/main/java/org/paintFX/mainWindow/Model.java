@@ -2,11 +2,19 @@ package org.paintFX.mainWindow;
 
 import javafx.application.Platform;
 import javafx.embed.swing.SwingFXUtils;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Label;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 
@@ -19,9 +27,17 @@ import org.paintFX.shapes.Rectangle;
 
 import javax.imageio.ImageIO;
 import java.io.*;
+import java.lang.module.Configuration;
+import java.lang.module.ModuleDescriptor;
+import java.lang.module.ModuleFinder;
+import java.lang.module.ModuleReference;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class Model {
 
@@ -44,6 +60,64 @@ public class Model {
         this.g = canvas.getGraphicsContext2D();
 
         initFileChooser();
+    }
+
+    public void loadPlugins(Label toolLabel, ToggleGroup group, HBox lastBox, VBox toolBox) {
+        Path pluginsDir = Paths.get("plugins");
+
+        ModuleFinder pluginsFinder = ModuleFinder.of(pluginsDir);
+
+        List<String> plugins = pluginsFinder
+                .findAll()
+                .stream()
+                .map(ModuleReference::descriptor)
+                .map(ModuleDescriptor::name)
+                .collect(Collectors.toList());
+
+        Configuration pluginsConfiguration = ModuleLayer
+                .boot()
+                .configuration()
+                .resolve(pluginsFinder, ModuleFinder.of(), plugins);
+
+        ModuleLayer layer = ModuleLayer
+                .boot()
+                .defineModulesWithOneLoader(pluginsConfiguration, ClassLoader.getSystemClassLoader());
+
+
+        List<IService> services = IService.getServices(layer);
+
+        HBox hBox = null;
+        int iterator = 0;
+        for (IService service : services) {
+            ToggleButton button = new ToggleButton();
+            button.setToggleGroup(group);
+            button.setGraphic(new ImageView(service.getIcon()));
+            button.setOnAction(e -> {
+                toolLabel.setText("Tool : " + service.getToolName());
+
+                resetMouseEvents();
+
+                setShapeFactory(service.createFactory());
+                bindMouseForDrawingShapes();
+            });
+
+            if (lastBox.getChildren().size() < 2) {
+                lastBox.getChildren().add(button);
+            } else {
+                if (iterator % 2 == 0) {
+                    hBox = new HBox();
+                    hBox.setAlignment(Pos.CENTER);
+                    hBox.setSpacing(5);
+                    hBox.setPadding(new Insets(5, 0, 5, 0));
+                    toolBox.getChildren().add(hBox);
+                }
+
+                hBox.getChildren().add(button);
+
+                iterator++;
+            }
+
+        }
     }
 
     public PaintMode getPaintMode() {
@@ -114,7 +188,7 @@ public class Model {
 
         canvas.setOnMouseReleased(e -> {
             components.addComponent(composite);
-            components.clearMemory();
+            components.clearHistory();
             setPenTool();
         });
 
@@ -145,7 +219,7 @@ public class Model {
 
         canvas.setOnMouseReleased(e -> {
             components.addComponent(composite);
-            components.clearMemory();
+            components.clearHistory();
             setEraserTool();
         });
     }
@@ -154,7 +228,7 @@ public class Model {
 
     public void removeComponents() {
         components.removeAllComponents();
-        components.clearMemory();
+        components.clearHistory();
     }
 
     public void bindMouseForDrawingShapes() {
@@ -173,7 +247,7 @@ public class Model {
                 if (!newShape.isContinue(points.size())) {
                     components.addComponent(newShape);
 
-                    components.clearMemory();
+                    components.clearHistory();
                     clearPoints();
                     bindMouseForDrawingShapes();
                 }
@@ -185,7 +259,7 @@ public class Model {
                 }
 
                 clearPoints();
-                components.clearMemory();
+                components.clearHistory();
                 bindMouseForDrawingShapes();
             }
         });
@@ -246,13 +320,26 @@ public class Model {
 
     public void onSerialize(File selectedFile) {
 
-        try {
-            FileOutputStream fileOutputStream = new FileOutputStream(selectedFile.getAbsolutePath());
-            ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
+        try (FileOutputStream fos = new FileOutputStream(selectedFile.getAbsolutePath());
+             ObjectOutputStream oos = new ObjectOutputStream(fos)){
 
-            objectOutputStream.writeDouble(canvasPane.getMaxWidth());
-            objectOutputStream.writeDouble(canvasPane.getMaxHeight());
-            objectOutputStream.writeObject(components);
+            oos.writeDouble(canvasPane.getMaxWidth());
+            oos.writeDouble(canvasPane.getMaxHeight());
+
+            Deque<Drawable> temp;
+            temp = components.getComponents();
+            oos.writeInt(temp.size());
+
+            for (Drawable component : temp) {
+                oos.writeObject(component);
+            }
+
+            temp = components.getHistory();
+            oos.writeInt(temp.size());
+
+            for (Drawable component : temp) {
+                oos.writeObject(component);
+            }
 
             fileChooser.setInitialDirectory(selectedFile.getParentFile());
 
@@ -261,6 +348,7 @@ public class Model {
         } catch (NullPointerException e1) {
             System.out.println("File is not valid");
         }
+
     }
 
     public void onDeserialize() {
@@ -272,21 +360,42 @@ public class Model {
 
         File selectedFile = fileChooser.showOpenDialog(stage);
 
-        try {
-            FileInputStream fileInputStream = new FileInputStream(selectedFile.getAbsolutePath());
-            ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
+        try (FileInputStream fis = new FileInputStream(selectedFile.getAbsolutePath());
+             ObjectInputStream ois = new ObjectInputStream(fis)) {
 
-            double width = objectInputStream.readDouble();
-            double height = objectInputStream.readDouble();
+            double width = ois.readDouble();
+            double height = ois.readDouble();
 
             resizePane(width, height);
             resizeCanvas(width, height);
 
             clearCanvas();
-            components = (Composite) objectInputStream.readObject();
-            components.draw(g);
 
-        } catch (IOException | ClassNotFoundException e) {
+            int componentsCount;
+
+            components.clear();
+            components.clearHistory();
+
+            componentsCount = ois.readInt();
+            for (int i = 0; i < componentsCount; i++) {
+                try {
+                    components.addComponent((Drawable) ois.readObject());
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            componentsCount = ois.readInt();
+            for (int i = 0; i < componentsCount; i++) {
+                try {
+                    components.addComponentToHistory((Drawable) ois.readObject());
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            components.draw(g);
+        } catch (IOException e) {
             e.printStackTrace();
         } catch (NullPointerException e1) {
             System.out.println("File is not valid");
@@ -322,7 +431,7 @@ public class Model {
             String fileName = selectedFile.getName();
             String fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1, selectedFile.getName().length());
 
-            System.out.format("Name: %s ; Extension: %s", fileName,fileExtension);
+            System.out.format("Name: %s ; Extension: %s\n", fileName,fileExtension);
 
             if (Objects.equals(fileExtension, "bin")) {
                 onSerialize(selectedFile);
@@ -353,6 +462,10 @@ public class Model {
     }
 
     private void initFileChooser() {
+        File theDir = new File("out");
+        if (!theDir.exists()){
+            theDir.mkdirs();
+        }
         fileChooser.setInitialDirectory(new File("out/"));
 
     }

@@ -6,7 +6,7 @@ import java.util.List;
 
 public abstract class Shape implements Drawable {
 
-    protected int requiredPointsCount;
+    public int requiredPointsCount;
 
     protected double borderSize;
     protected SColor fillColor;

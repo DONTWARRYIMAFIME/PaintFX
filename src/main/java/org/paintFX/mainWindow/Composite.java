@@ -9,15 +9,31 @@ import java.util.Deque;
 
 public class Composite implements Drawable {
     private final Deque<Drawable> components = new ArrayDeque<>();
-    private final Deque<Drawable> memory = new ArrayDeque<>();
+    private final Deque<Drawable> history = new ArrayDeque<>();
 
     public void addComponent(Drawable component) {
         components.offerLast(component);
     }
 
+    public void addComponentToHistory(Drawable component) {
+        history.offerLast(component);
+    }
+
+    public Deque<Drawable> getComponents() {
+        return components;
+    }
+
+    public Deque<Drawable> getHistory() {
+        return history;
+    }
+
+    public void clear() {
+        components.clear();
+    }
+
     public void undoComponent() {
         try {
-            memory.offerLast(components.pollLast());
+            history.offerLast(components.pollLast());
         } catch (NullPointerException e) {
             System.out.println("Nothing to undo");
         }
@@ -25,14 +41,14 @@ public class Composite implements Drawable {
 
     public void redoComponent() {
         try {
-            components.offerLast(memory.pollLast());
+            components.offerLast(history.pollLast());
         } catch (NullPointerException e) {
             System.out.println("Nothing to redo");
         }
     }
 
-    public void clearMemory() {
-        memory.clear();
+    public void clearHistory() {
+        history.clear();
     }
 
     public void removeAllComponents() {
@@ -57,8 +73,8 @@ public class Composite implements Drawable {
     }
 
     public void drawLast(GraphicsContext g) {
-            assert components.peekLast() != null;
-            components.peekLast().draw(g);
+        assert components.peekLast() != null;
+        components.peekLast().draw(g);
     }
 
 

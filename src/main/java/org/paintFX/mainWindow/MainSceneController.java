@@ -1,8 +1,6 @@
 package org.paintFX.mainWindow;
 
 import javafx.fxml.FXML;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
@@ -13,18 +11,9 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import org.paintFX.Loader;
 import org.paintFX.shapeFactory.*;
-import org.paintFX.core.IService;
 import org.paintFX.core.PaintMode;
 
-import java.lang.module.Configuration;
-import java.lang.module.ModuleDescriptor;
-import java.lang.module.ModuleFinder;
-import java.lang.module.ModuleReference;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.List;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 public class MainSceneController {
 
@@ -99,68 +88,8 @@ public class MainSceneController {
     private VBox toolBox;
 
     private void loadPlugins() {
-        Path pluginsDir = Paths.get("plugins");
-
-        // Будем искать плагины в папке plugins
-        ModuleFinder pluginsFinder = ModuleFinder.of(pluginsDir);
-
-        // Пусть ModuleFinder найдёт все модули в папке plugins и вернёт нам список их имён
-        List<String> plugins = pluginsFinder
-                .findAll()
-                .stream()
-                .map(ModuleReference::descriptor)
-                .map(ModuleDescriptor::name)
-                .collect(Collectors.toList());
-
-        // Создадим конфигурацию, которая выполнит резолюцию указанных модулей (проверит корректность графа зависимостей)
-        Configuration pluginsConfiguration = ModuleLayer
-                .boot()
-                .configuration()
-                .resolve(pluginsFinder, ModuleFinder.of(), plugins);
-
-        // Создадим слой модулей для плагинов
-        ModuleLayer layer = ModuleLayer
-                .boot()
-                .defineModulesWithOneLoader(pluginsConfiguration, ClassLoader.getSystemClassLoader());
-
-        // Найдём все реализации сервиса IService в слое плагинов и в слое Boot
-        List<IService> services = IService.getServices(layer);
-
-        HBox hBox = null;
-        int iterator = 0;
-        for (IService service : services) {
-            ToggleButton button = new ToggleButton();
-            button.setToggleGroup(tools);
-            button.setGraphic(new ImageView(service.getIcon()));
-            //button.setText(service.getToolName());
-            button.setOnAction(e -> {
-                lblTool.setText("Tool : " + service.getToolName());
-
-                resetMouseEvents();
-
-                model.setShapeFactory(service.createFactory());
-                model.bindMouseForDrawingShapes();
-            });
-
-            if (lastBox.getChildren().size() < 2) {
-                lastBox.getChildren().add(button);
-            } else {
-                if (iterator % 2 == 0) {
-                    hBox = new HBox();
-                    hBox.setAlignment(Pos.CENTER);
-                    hBox.setSpacing(5);
-                    hBox.setPadding(new Insets(5, 0, 5, 0));
-                    toolBox.getChildren().add(hBox);
-                }
-
-                hBox.getChildren().add(button);
-
-                iterator++;
-            }
-
-        }
+        model.loadPlugins(lblTool, tools, lastBox, toolBox);
     }
-
 
     public void initialize() {
         //Init model

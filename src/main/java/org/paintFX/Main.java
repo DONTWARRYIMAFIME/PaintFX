@@ -15,8 +15,8 @@ public class Main extends Application {
     @Override
     public void start(Stage stage) throws IOException {
 
-        String title = "Version - 0.08";
-        Scene scene = new Scene(Loader.loadFXML("Scenes/MainScene").load());
+        String title = "Version - 1.0";
+        Scene scene = new Scene(Loader.loadFXML("scenes/MainScene").load());
 
         stage.setTitle(title);
         stage.getIcons().add(Loader.loadImage("icon.png"));
