@@ -381,7 +381,7 @@ public class Model {
                 try {
                     components.addComponent((Drawable) ois.readObject());
                 } catch (ClassNotFoundException e) {
-                    e.printStackTrace();
+                    System.out.println("Cannot load a shape.");
                 }
             }
 
@@ -390,7 +390,7 @@ public class Model {
                 try {
                     components.addComponentToHistory((Drawable) ois.readObject());
                 } catch (ClassNotFoundException e) {
-                    e.printStackTrace();
+                    System.out.println("Cannot load a shape.");
                 }
             }
 
