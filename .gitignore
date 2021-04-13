@@ -1,6 +1,5 @@
 .idea/
 out/
 *.class
-*.iml
 *.lst
 *.properties

@@ -83,8 +83,7 @@ public class Model {
                 .boot()
                 .defineModulesWithOneLoader(pluginsConfiguration, ClassLoader.getSystemClassLoader());
 
-
-        List<IService> services = IService.getServices(layer);
+        List<IService>  services = IService.getServices(layer);
 
         HBox hBox = null;
         int iterator = 0;
@@ -97,7 +96,7 @@ public class Model {
 
                 resetMouseEvents();
 
-                setShapeFactory(service.createFactory());
+                setShapeFactory((borderSize, fillColor, borderColor, paintMode) -> service.createShape(borderSize, fillColor, borderColor, paintMode));
                 bindMouseForDrawingShapes();
             });
 

@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 public interface IService {
     String getToolName();
     Image getIcon();
-    ShapeFactory createFactory();
+    Shape createShape(double v, SColor sColor, SColor sColor1, PaintMode paintMode);
 
     static List<IService> getServices(ModuleLayer layer) {
         return ServiceLoader
