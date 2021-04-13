@@ -63,7 +63,7 @@ public class Model {
     }
 
     public void loadPlugins(Label toolLabel, ToggleGroup group, HBox lastBox, VBox toolBox) {
-        Path pluginsDir = Paths.get("plugins");
+        Path pluginsDir = Paths.get("");
 
         ModuleFinder pluginsFinder = ModuleFinder.of(pluginsDir);
 

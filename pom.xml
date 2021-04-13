@@ -29,13 +29,15 @@
             <groupId>org.paintFX</groupId>
             <artifactId>core</artifactId>
             <version>1.0</version>
-            <scope>compile</scope>
+            <scope>system</scope>
+            <systemPath>${basedir}/src/core-1.0.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>org.paintFX</groupId>
             <artifactId>TrapeziumPlugin</artifactId>
             <version>1.0</version>
-            <scope>compile</scope>
+            <scope>system</scope>
+            <systemPath>${basedir}/plugins/TrapeziumPlugin-1.0.jar</systemPath>
         </dependency>
     </dependencies>
     <build>
